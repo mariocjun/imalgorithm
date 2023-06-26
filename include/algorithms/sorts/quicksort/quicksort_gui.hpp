@@ -44,7 +44,7 @@ public:
 
         ImGui::Text("Nb Values:");
         ImGui::SameLine();
-        ImGui::InputInt("", &length, 0);
+        ImGui::InputInt("##", &length, 0);
         ImGui::SameLine();
         if(ImGui::Button("Generate") && length > 0) {
             std::random_device rnd_device;
@@ -60,7 +60,7 @@ public:
         }
 
         ImGui::SliderFloat(
-            "", &steps_per_s, 1.0f, 100.0f, "%.01f step/s",
+                "##", &steps_per_s, 1.0f, 100.0f, "%.01f step/s",
             ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
         ImGui::SameLine();
         if(ImGui::Button("Play")) {
