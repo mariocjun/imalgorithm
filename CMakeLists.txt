@@ -1,41 +1,41 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.25)
 
-project(
-    ImAlgorithm
-    VERSION 1.0
-    DESCRIPTION
-        "ImAlgorithm"
-    LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 23)
 
-# set(CMAKE_VERBOSE_MAKEFILE ON)
+# Nome do projeto
+set(PROJECT_NAME "VisualizadorDeAlgortimos-VCPKG-CLION-WIN11-IMGUI-CMAKE")
+project(${PROJECT_NAME})
 
-# ################### Options ####################
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CONAN_DISABLE_CHECK_COMPILER ON)
+# Adiciona a flag de debug
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-option(WARNINGS "" OFF)
-option(HARDCORE_WARNINGS "" OFF)
-option(COMPILE_FOR_NATIVE "" OFF)
-option(COMPILE_WITH_LTO "" OFF)
+include_directories(cmake-build-debug/vcpkg_installed/x64-windows)
+include_directories(include)
+include_directories(include/utils)
+include_directories(include/algorithms)
+include_directories(include/algorithms/graphs/djikstra)
+include_directories(include/algorithms/sorts/bubblesort)
+include_directories(include/algorithms/sorts/quicksort)
 
-set(WARNINGS_LIST "-Wall;-Wextra;")
-set(HARDCORE_WARNINGS_LIST
-    "-Wall;-Wextra;-Wshadow;-Wpedantic;-Wnon-virtual-dtor;-Wold-style-cast;-Wcast-align;-Wunused;-Woverloaded-virtual;-Wpedantic;-Wconversion;-Wsign-conversion;-Wmisleading-indentation;-Wduplicated-cond;-Wduplicated-branches;-Wlogical-op;-Wnull-dereference;-Wuseless-cast;-Wdouble-promotion;-Wformat=2;-Wlifetime"
-)
+# Adiciona o diretório src com os arquivos fonte do projeto
+file(GLOB SRC_FILES CONFIGURE_DEPENDS "src/*.hpp" "src/*.cpp")
 
-# ################### Modules ####################
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
-include(GNUInstallDirs)
-include(CMakeBuildTypeUtils)
+# Adiciona os arquivos fonte ao projeto, e cria um executável
+add_executable(${PROJECT_NAME} ${SRC_FILES})
+
+FIND_PACKAGE(glfw3 CONFIG REQUIRED)
+FIND_PACKAGE(glad CONFIG REQUIRED)
+FIND_PACKAGE(glm CONFIG REQUIRED)
+FIND_PACKAGE(OpenGL)
+FIND_PACKAGE(glew CONFIG REQUIRED)
+FIND_PACKAGE(imgui CONFIG REQUIRED)
+FIND_PACKAGE(TBB CONFIG REQUIRED)
+FIND_PACKAGE(range-v3 CONFIG REQUIRED)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE range-v3::meta range-v3::concepts range-v3::range-v3 glfw glad::glad glm::glm OpenGL::GL GLEW::GLEW imgui::imgui TBB::tbb TBB::tbbmalloc TBB::tbbmalloc_proxy)
 
 
-# ################### Packages ####################
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup(TARGETS)
 
-# ################### IMALGORITHM #####################
-add_executable(imalgorithm src/main.cpp imgui_backends/imgui_impl_glfw.cpp
-imgui_backends/imgui_impl_opengl3.cpp)
-target_include_directories(imalgorithm PUBLIC include imgui_backends)
-target_link_libraries(imalgorithm PUBLIC CONAN_PKG::imgui CONAN_PKG::glfw CONAN_PKG::glew)
+
+
+
