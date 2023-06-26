@@ -57,6 +57,7 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 /cmake-build-default/
+/cmake-build-debug/
 
 ### CMake Patch ###
 # External projects
