@@ -27,9 +27,18 @@ jobs:
       - name: Create vcpkg cache directory
         run: mkdir -p "${{ github.workspace }}/vcpkgcache"
 
-      - name: Install dependencies
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
         run: |
           ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
+        env:
+          VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkgcache"
+          VCPKG_FEATURE_FLAGS: "manifests,versions"
+
+      - name: Install dependencies (Ubuntu, macOS)
+        if: runner.os != 'Windows'
+        run: |
+          # Aqui execute o comando para instalar as bibliotecas necessárias para Ubuntu e macOS
         env:
           VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkgcache"
           VCPKG_FEATURE_FLAGS: "manifests,versions"
