@@ -16,13 +16,13 @@ jobs:
 
       - name: Create vcpkg cache directory
         run: |
-          mkdir -p $(System.DefaultWorkingDirectory)/vcpkgcache
+          mkdir "${{ github.workspace }}/vcpkgcache"
 
       - name: Install dependencies
         run: |
           .\vcpkg\vcpkg.exe install --feature-flags=binarycaching,manifests
         env:
-          VCPKG_DEFAULT_BINARY_CACHE: $(System.DefaultWorkingDirectory)/vcpkgcache
+          VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkgcache"
           VCPKG_FEATURE_FLAGS: "manifests,versions"
 
       - name: Create Build Directory
@@ -39,4 +39,4 @@ jobs:
       - name: Build Project
         run: |
           cd cmake-build-debug
-          cmake --build .
+          cmake --build . --config Debug
