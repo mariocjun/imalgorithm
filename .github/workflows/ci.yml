@@ -14,12 +14,16 @@ jobs:
           git clone https://github.com/microsoft/vcpkg
           .\vcpkg\bootstrap-vcpkg.bat
 
+      - name: Create vcpkg cache directory
+        run: |
+          mkdir -p $(System.DefaultWorkingDirectory)/vcpkgcache
+
       - name: Install dependencies
-        env:
-          VCPKG_DEFAULT_BINARY_CACHE: ./vcpkgcache
-          VCPKG_FEATURE_FLAGS: "manifests,versions"
         run: |
           .\vcpkg\vcpkg.exe install --feature-flags=binarycaching,manifests
+        env:
+          VCPKG_DEFAULT_BINARY_CACHE: $(System.DefaultWorkingDirectory)/vcpkgcache
+          VCPKG_FEATURE_FLAGS: "manifests,versions"
 
       - name: Create Build Directory
         run: |
