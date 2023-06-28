@@ -16,7 +16,7 @@ jobs:
 
       - name: Install dependencies
         env:
-          VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/.vcpkgcache
+          VCPKG_DEFAULT_BINARY_CACHE: ./vcpkgcache
           VCPKG_FEATURE_FLAGS: "manifests,versions"
         run: |
           .\vcpkg\vcpkg.exe install --feature-flags=binarycaching,manifests
