@@ -32,9 +32,9 @@ jobs:
       - name: Configure CMake
         run: |
           cd cmake-build-debug
-          cmake ..
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
         env:
-          VCPKG_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+          VCPKG_TARGET_TRIPLET: x64-windows
 
       - name: Build Project
         run: |
