@@ -27,7 +27,7 @@
     "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n\n    find_package(imgui CONFIG REQUIRED)\n\n    target_link_libraries(main PRIVATE imgui::imgui)\n"
   }, {
     "name" : "glew",
-    "default-features": true,
+    "default-features": true
   },{
     "name" : "range-v3",
     "default-features": true,
