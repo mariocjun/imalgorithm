@@ -1,52 +1,52 @@
--name: CI-teste
+  -name: CI-teste
 
-on: [push, pull_request]
+  on: [push, pull_request]
 
-jobs:
-  build-and-test:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+  jobs:
+    build-and-test:
+      strategy:
+        matrix:
+          os: [ubuntu-latest, macos-latest, windows-latest]
+      runs-on: ${{ matrix.os }}
 
-    steps:
-      - uses: actions/checkout@v2
+      steps:
+        - uses: actions/checkout@v2
 
-      - name: Configurar ambiente
-        run: |
-          git clone https://github.com/microsoft/vcpkg
-          if [[ "${{ runner.os }}" == "Windows" ]]; then 
-              .\vcpkg\bootstrap-vcpkg.bat
-              echo "VCPKG_TARGET_TRIPLET=x64-windows" >> $GITHUB_ENV
-          else
-              ./vcpkg/bootstrap-vcpkg.sh
-              echo "VCPKG_TARGET_TRIPLET=x64-linux" >> $GITHUB_ENV
-          fi
+        - name: Configurar ambiente
+          run: |
+            git clone https://github.com/microsoft/vcpkg
+            if [[ "${{ runner.os }}" == "Windows" ]]; then 
+                .\vcpkg\bootstrap-vcpkg.bat
+                echo "VCPKG_TARGET_TRIPLET=x64-windows" >> $GITHUB_ENV
+            else
+                ./vcpkg/bootstrap-vcpkg.sh
+                echo "VCPKG_TARGET_TRIPLET=x64-linux" >> $GITHUB_ENV
+            fi
 
-      - name: Criar diretório de cache vcpkg
-        run: mkdir -p "${{ github.workspace }}/vcpkgcache"
+        - name: Criar diretório de cache vcpkg
+          run: mkdir -p "${{ github.workspace }}/vcpkgcache"
 
-      - name: Instalar dependências
-        run: |
-          if [[ "${{ runner.os }}" == "Windows" ]]; then 
-            ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
-          else
-            sed -i 's/,[[:space:]]*"dx11-binding",[[:space:]]*"win32-binding"[[:space:]]*//g' vcpkg.json
-            ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
-          fi
-        env:
-          VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkgcache"
-          VCPKG_FEATURE_FLAGS: "manifests,versions"
+        - name: Instalar dependências
+          run: |
+            if [[ "${{ runner.os }}" == "Windows" ]]; then 
+              ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
+            else
+              sed -i 's/,[[:space:]]*"dx11-binding",[[:space:]]*"win32-binding"[[:space:]]*//g' vcpkg.json
+              ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
+            fi
+          env:
+            VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkgcache"
+            VCPKG_FEATURE_FLAGS: "manifests,versions"
 
-      - name: Criar diretório de construção
-        run: mkdir cmake-build-debug
+        - name: Criar diretório de construção
+          run: mkdir cmake-build-debug
 
-      - name: Configurar CMake
-        run: |
-          cd cmake-build-debug
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        - name: Configurar CMake
+          run: |
+            cd cmake-build-debug
+            cmake .. -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
 
-      - name: Construir projeto
-        run: |
-          cd cmake-build-debug
-          cmake --build . --config Debug
+        - name: Construir projeto
+          run: |
+            cd cmake-build-debug
+            cmake --build . --config Debug
