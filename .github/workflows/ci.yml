@@ -24,6 +24,17 @@ jobs:
               echo "VCPKG_TARGET_TRIPLET=x64-linux" >> $GITHUB_ENV
           fi
 
+      - name: Configurar Dependiencias
+        shell: bash
+        run: |
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+              CONFIG_BLOCK='{ "name" : "imgui", "features" : [ "glfw-binding", "opengl3-binding", "dx11-binding", "win32-binding", "docking-experimental" ], "$comment" : "..." }'
+          else
+              CONFIG_BLOCK='{ "name" : "imgui", "features" : [ "glfw-binding", "opengl3-binding", "docking-experimental" ], "$comment" : "..." }'
+          fi
+
+          sed "s|{ \"name\" : \"imgui\" .*}|${CONFIG_BLOCK}|" vcpkg.json > temp.json && mv temp.json vcpkg.json
+
       - name: Instalar dependências do Ubuntu
         if: runner.os == 'Linux'
         shell: bash
@@ -37,17 +48,7 @@ jobs:
       - name: Instalar dependências
         shell: bash
         run: |
-          if [[ "${{ runner.os }}" == "Windows" ]]; then
-              ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
-          else
-              echo ', ' >> vcpkg.json
-              cat vcpkg.json
-              sed 's/ *"dx11-binding", *//; s/ *"win32-binding", *//' vcpkg.json > temp.json && mv temp.json vcpkg.json
-              cat vcpkg.json
-              sed 's/,[[:space:]]*$//' vcpkg.json > temp.json && mv temp.json vcpkg.json
-              cat vcpkg.json
-              ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
-          fi
+          ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
         env:
           VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkgcache"
           VCPKG_FEATURE_FLAGS: "manifests,versions"
