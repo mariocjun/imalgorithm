@@ -32,7 +32,7 @@ jobs:
             ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
           else
             # remove recursos incompatíveis antes da instalação
-            sed -i 's/, "imgui"[^,]*/ /' vcpkg.json
+            jq '.dependencies[] | select(.name=="imgui") .features -= ["dx11-binding", "win32-binding"]' vcpkg.json | sponge vcpkg.json
             vcpkg install --feature-flags=binarycaching,manifests
           fi
         env:
