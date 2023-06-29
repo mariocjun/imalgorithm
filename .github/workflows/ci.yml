@@ -17,19 +17,22 @@ jobs:
         run: |
           git clone https://github.com/microsoft/vcpkg
           if [[ "${{ runner.os }}" == "Windows" ]]; then 
-              ./vcpkg/bootstrap-vcpkg.bat
-              echo "VCPKG_TARGET_TRIPLET=x64-windows" >> $GITHUB_ENV
+            ./vcpkg/bootstrap-vcpkg.bat
+            echo "VCPKG_TARGET_TRIPLET=x64-windows" >> $GITHUB_ENV
           else
-              ./vcpkg/bootstrap-vcpkg.sh
-              echo "VCPKG_TARGET_TRIPLET=x64-linux" >> $GITHUB_ENV
+            ./vcpkg/bootstrap-vcpkg.sh
+            echo "VCPKG_TARGET_TRIPLET=x64-linux" >> $GITHUB_ENV
           fi
 
       - name: Configurar Dependencias
         shell: bash
         run: |
-          if [[ "${{ runner.os }}" != "Windows" ]]; then
+          if [[ "${{ runner.os }}" == "Linux" ]]; then
             sed -i '/"dx11-binding",/d' vcpkg.json
             sed -i '/"win32-binding",/d' vcpkg.json
+          elif [[ "${{ runner.os }}" == "macOS" ]]; then
+            sed -i '' '/"dx11-binding",/d' vcpkg.json
+            sed -i '' '/"win32-binding",/d' vcpkg.json
           fi
 
       - name: Instalar dependências do Ubuntu
