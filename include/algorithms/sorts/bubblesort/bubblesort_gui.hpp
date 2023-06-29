@@ -11,8 +11,7 @@
 #include "algorithm_gui.hpp"
 #include "algorithms/sorts/bubblesort/bubblesort_coroutine.hpp"
 
-namespace ImAlgorithm {
-namespace bubblesort {
+namespace ImAlgorithm::bubblesort {
 
 class BubbleSortGUI : public AlgorithmGUI {
 private:
@@ -54,10 +53,18 @@ public:
                 bubblesort(values, cmp_indices, swap_indices));
             play = false;
         }
-
         ImGui::SliderFloat(
-                "##", &steps_per_s, 1.0f, 1000.0f, "%.01f step/s",
+                "##slide_float", &steps_per_s, 1.0f, 1000.0f, "%.01f step/s",
             ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
+
+        // Bloco de código adicionado para permitir o uso da roda do mouse para alterar o valor do slider
+        ImGui::SetItemKeyOwner(ImGuiKey_MouseWheelY);
+        float wheel = ImGui::GetIO().MouseWheel;
+        if(wheel != 0.0f && ImGui::IsItemHovered()) {
+            steps_per_s = std::clamp(
+                steps_per_s * std::pow(2.0f, wheel), 1.0f, 1000.0f);
+        }
+
         ImGui::SameLine();
         if(ImGui::Button("Play")) {
             play = true;
@@ -113,6 +120,26 @@ public:
             draw_value_rect(i, IM_COL32(255 - c, 0, c, 255));
         }
 
+/*        for (std::size_t i = 0; i < values.size(); ++i) {
+            const float c = 255 * static_cast<float>(values[i] - min_value) / (max_value - min_value);
+
+            ImU32 color;
+            if (c < 36)
+                color = IM_COL32(255, 0, c * 7, 255); // Vermelho para Laranja
+            else if (c < 72)
+                color = IM_COL32(255 - (c - 36) * 7, (c - 36) * 7, 0, 255); // Laranja para Amarelo
+            else if (c < 108)
+                color = IM_COL32(0, 255 - (c - 72) * 7, (c - 72) * 7, 255); // Amarelo para Verde
+            else if (c < 144)
+                color = IM_COL32((c - 108) * 7, 0, 255 - (c - 108) * 7, 255); // Verde para Azul
+            else if (c < 180)
+                color = IM_COL32(0, (c - 144) * 7, 255 - (c - 144) * 7, 255); // Azul para Anil (Índigo)
+            else
+                color = IM_COL32((c - 180) * 7, 0, 255, 255); // Anil (Índigo) para Violeta
+
+            draw_value_rect(i,color);
+        }*/
+
         BubblesortStepFlags step_flags = bubblesort_coroutine->current_step();
 
         if(b_highlight_cmp && step_flags & HighlightCmp) {
@@ -126,7 +153,7 @@ public:
 
         ImGui::End();
     }
-    void show(ImVec2 pos, ImVec2 size) {
+    void show(ImVec2 pos, ImVec2 size) override {
         showControlPanel(ImVec2(pos.x, pos.y + size.y - 100),
                          ImVec2(size.x, 100));
         if(bubblesort_coroutine.has_value()) {
@@ -146,10 +173,10 @@ public:
             showValues(pos, ImVec2(size.x, size.y - 100));
         }
     };
-    const char * name() const { return "BubbleSort"; }
+    [[nodiscard]] const char * name() const override { return "BubbleSort"; }
 };
 
-}  // namespace bubblesort
-}  // namespace ImAlgorithm
+} // namespace ImAlgorithm::bubblesort
+
 
 #endif  // IMALGORITHM_BUBBLESORT_GUI_HPP

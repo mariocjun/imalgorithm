@@ -2,6 +2,7 @@
 #define IMALGORITHM_ALGORITHM_GUI_HPP
 
 #include <imgui.h>
+#include "imgui_internal.h"
 
 #include "utils/imvec_operators.hpp"
 

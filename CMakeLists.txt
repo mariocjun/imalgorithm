@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.12)
 
 set(CMAKE_CXX_STANDARD 23)
 
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+endif()
+
 # Nome do projeto
 set(PROJECT_NAME "VisualizadorDeAlgortimos-VCPKG-CLION-WIN11-IMGUI-CMAKE")
 project(${PROJECT_NAME})

@@ -11,8 +11,7 @@
 #include "algorithm_gui.hpp"
 #include "algorithms/sorts/quicksort/quicksort_coroutine.hpp"
 
-namespace ImAlgorithm {
-namespace quicksort {
+namespace ImAlgorithm::quicksort {
 
 template <decltype(quicksort_lomuto) F>
 class QuickSortGUI : public AlgorithmGUI {
@@ -29,7 +28,7 @@ private:
 
     std::vector<int> values;
     std::stack<std::pair<std::size_t, std::size_t>> bounds;
-    std::size_t pivot;
+    std::size_t pivot{};
     std::pair<std::size_t, std::size_t> cmp_indices;
     std::pair<std::size_t, std::size_t> swap_indices;
 
@@ -62,6 +61,15 @@ public:
         ImGui::SliderFloat(
                 "##", &steps_per_s, 1.0f, 100.0f, "%.01f step/s",
             ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
+
+        // Bloco de código adicionado para permitir o uso da roda do mouse para alterar o valor do slider
+        ImGui::SetItemKeyOwner(ImGuiKey_MouseWheelY);
+        float wheel = ImGui::GetIO().MouseWheel;
+        if(wheel != 0.0f && ImGui::IsItemHovered()) {
+            steps_per_s = std::clamp(
+                    steps_per_s * std::pow(2.0f, wheel), 1.0f, 1000.0f);
+        }
+
         ImGui::SameLine();
         if(ImGui::Button("Play")) {
             play = true;
@@ -141,7 +149,7 @@ public:
 
         ImGui::End();
     }
-    void show(ImVec2 pos, ImVec2 size) {
+    void show(ImVec2 pos, ImVec2 size) override {
         showControlPanel(ImVec2(pos.x, pos.y + size.y - 100),
                          ImVec2(size.x, 100));
         if(quicksort_coroutine.has_value()) {
@@ -161,13 +169,13 @@ public:
             showValues(pos, ImVec2(size.x, size.y - 100));
         }
     };
-    const char * name() const { return "Quicksort"; }
+    [[nodiscard]] const char * name() const override { return "Quicksort"; }
 };
 
 using QuickSortLomutoGUI = QuickSortGUI<quicksort_lomuto>;
 using QuickSortHoareGUI = QuickSortGUI<quicksort_hoare>;
 
-}  // namespace quicksort
-}  // namespace ImAlgorithm
+} // namespace ImAlgorithm::quicksort
+
 
 #endif  // IMALGORITHM_QUICKSORT_GUI_HPP
