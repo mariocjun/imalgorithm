@@ -31,8 +31,13 @@ jobs:
           if [[ "${{ runner.os }}" == "Windows" ]]; then 
             ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
           else
-            # remove recursos incompatíveis antes da instalação
-            jq 'if .dependencies[] | select(.name?) | .name == "imgui" then .dependencies[].features |= map(select(. != "dx11-binding" and . != "win32-binding")) else . end' vcpkg.json > temp.json && mv temp.json vcpkg.json            
+            jq '
+              if .dependencies[] | select(.name?) | .name == "imgui" then
+                .dependencies |= map(if .name == "imgui" then .features |= map(select(. != "dx11-binding" and . != "win32-binding")) else . end)
+              else 
+                . 
+              end
+            ' vcpkg.json > temp.json && mv temp.json vcpkg.json
             ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
           fi
         env:
