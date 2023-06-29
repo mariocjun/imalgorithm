@@ -1,40 +1,56 @@
 {
   "name" : "visualizador-algoritmos",
   "version-string" : "1.0.0",
-  "dependencies" : [ {
-    "name" : "glfw3",
-    "default-features" : true,
-    "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n\n    find_package(glfw3 CONFIG REQUIRED)\n\n    target_link_libraries(main PRIVATE glfw)\n"
-  }, {
-    "name" : "glad",
-    "default-features" : true,
-    "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n\n    find_package(glad CONFIG REQUIRED)\n\n    target_link_libraries(main PRIVATE glad::glad)\n"
-  }, {
-    "name" : "glm",
-    "default-features" : true,
-    "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n\n    find_package(glm CONFIG REQUIRED)\n\n    target_link_libraries(main PRIVATE glm::glm)\n"
-  }, {
-    "name" : "opengl",
-    "default-features" : true,
-    "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n\n    find_package(OpenGL REQUIRED)\n\n    target_link_libraries(main PRIVATE OpenGL::GL)\n"
-  }, {
-    "name" : "implot",
-    "default-features" : true,
-    "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n\n    find_package(implot CONFIG REQUIRED)\n\n    target_link_libraries(main PRIVATE implot::implot)\n"
-  }, {
-    "name" : "imgui",
-    "features" : [ "glfw-binding", "opengl3-binding", "dx11-binding", "win32-binding", "docking-experimental" ],
-    "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n\n    find_package(imgui CONFIG REQUIRED)\n\n    target_link_libraries(main PRIVATE imgui::imgui)\n"
-  }, {
-    "name" : "glew",
-    "default-features": true
-  },{
-    "name" : "range-v3",
-    "default-features": true,
-    "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n\n    find_package(range-v3 CONFIG REQUIRED)\n\n    target_link_libraries(main PRIVATE range-v3::meta range-v3::concepts range-v3::range-v3)\n"
-  }, {
-    "name" : "tbb",
-    "default-features": true,
-    "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n\n    find_package(TBB CONFIG REQUIRED)\n\n    target_link_libraries(main PRIVATE TBB::tbb TBB::tbbmalloc TBB::tbbmalloc_proxy)\n"
-  } ]
+  "dependencies" : [
+    {
+      "name" : "glfw3",
+      "default-features" : true,
+      "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n    find_package(glfw3 CONFIG REQUIRED)\n    target_link_libraries(main PRIVATE glfw)\n"
+    },
+    {
+      "name" : "glad",
+      "default-features" : true,
+      "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n    find_package(glad CONFIG REQUIRED)\n    target_link_libraries(main PRIVATE glad::glad)\n"
+    },
+    {
+      "name" : "glm",
+      "default-features" : true,
+      "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n    find_package(glm CONFIG REQUIRED)\n    target_link_libraries(main PRIVATE glm::glm)\n"
+    },
+    {
+      "name" : "opengl",
+      "default-features" : true,
+      "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n    find_package(OpenGL REQUIRED)\n    target_link_libraries(main PRIVATE OpenGL::GL)\n"
+    },
+    {
+      "name" : "implot",
+      "default-features" : true,
+      "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n    find_package(implot CONFIG REQUIRED)\n    target_link_libraries(main PRIVATE implot::implot)\n"
+    },
+    {
+      "name" : "imgui",
+      "features" : [
+        "glfw-binding",
+        "opengl3-binding",
+        "dx11-binding",
+        "win32-binding",
+        "docking-experimental"
+      ],
+      "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n    find_package(imgui CONFIG REQUIRED)\n    target_link_libraries(main PRIVATE imgui::imgui)\n"
+    },
+    {
+      "name" : "glew",
+      "default-features": true
+    },
+    {
+      "name" : "range-v3",
+      "default-features": true,
+      "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n    find_package(range-v3 CONFIG REQUIRED)\n    target_link_libraries(main PRIVATE range-v3::meta range-v3::concepts range-v3::range-v3)\n"
+    },
+    {
+      "name" : "tbb",
+      "default-features": true,
+      "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n    find_package(TBB CONFIG REQUIRED)\n    target_link_libraries(main PRIVATE TBB::tbb TBB::tbbmalloc TBB::tbbmalloc_proxy)\n"
+    }
+  ]
 }
