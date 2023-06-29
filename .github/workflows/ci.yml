@@ -35,11 +35,13 @@ jobs:
 
       - name: Instalar dependências
         run: |
-          if [[ "${{ runner.os }}" == "Windows" ]]; then 
-            ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+          ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
           else
-            sed 's/,[[:space:]]*"dx11-binding",[[:space:]]*"win32-binding"[[:space:]]*//g' vcpkg.json | tee vcpkg.json
-            ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
+          echo ', ' >> vcpkg.json
+          sed 's/ *"dx11-binding", *//; s/ *"win32-binding", *//' vcpkg.json > temp.json && mv temp.json vcpkg.json
+          sed 's/,[[:space:]]*$//' vcpkg.json > temp.json && mv temp.json vcpkg.json
+          ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
           fi
         env:
           VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkgcache"
