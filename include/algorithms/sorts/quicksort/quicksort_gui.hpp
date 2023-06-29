@@ -58,9 +58,11 @@ public:
             play = false;
         }
 
+        ImGui::Dummy(ImVec2(0.0f, 1.0f));  // Adiciona um espaço vertical de 10 unidades
         ImGui::SliderFloat(
-                "##", &steps_per_s, 1.0f, 100.0f, "%.01f step/s",
-            ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
+                "##slide_float", &steps_per_s, 1.0f, 1000.0f, "%.01f step/s",
+                ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput
+        );
 
         // Bloco de código adicionado para permitir o uso da roda do mouse para alterar o valor do slider
         ImGui::SetItemKeyOwner(ImGuiKey_MouseWheelY);
