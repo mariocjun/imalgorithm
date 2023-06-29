@@ -40,7 +40,7 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
-          sudo apt-get install -y libxmu-dev libxi-dev libgl-dev
+          sudo apt-get install -y libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
 
       - name: Criar diretório de cache vcpkg
         run: mkdir -p "${{ github.workspace }}/vcpkgcache"
