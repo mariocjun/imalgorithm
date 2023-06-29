@@ -77,7 +77,11 @@ jobs:
         shell: bash
         run: |
           cd cmake-build-debug
-          cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_TOOLCHAIN_FILE
+          if [[ "${{ runner.os }}" == "macOS" ]]; then 
+            cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_TOOLCHAIN_FILE
+          else
+            cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_TOOLCHAIN_FILE
+          fi
 
       - name: Fazer a build do projeto com CMake
         run: |
