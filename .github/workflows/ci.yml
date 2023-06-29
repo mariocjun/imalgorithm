@@ -40,6 +40,12 @@ jobs:
         shell: bash
         run: |
           sudo apt-get update
+          sudo apt-get install -y libxmu-dev libxi-dev libgl-dev
+
+      - name: Instalar dependências adicionais para GLFW
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
           sudo apt-get install -y libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
 
       - name: Criar diretório de cache vcpkg
