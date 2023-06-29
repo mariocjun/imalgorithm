@@ -1,5 +1,5 @@
 {
-  "name" : "untitled5",
+  "name" : "visualizador-algoritmos",
   "version-string" : "1.0.0",
   "dependencies" : [ {
     "name" : "glfw3",
