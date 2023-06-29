@@ -1,36 +1,56 @@
+# Define o mínimo necessário.
 cmake_minimum_required(VERSION 3.12)
-
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines")
 
+# Define o nome do projeto e o idioma.
+project("VisualizadorDeAlgortimos-VCPKG-CLION-WIN11-IMGUI-CMAKE" LANGUAGES CXX)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Usar a pasta build do cmake para diretório de saída.
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+# Incluir diretórios.
+include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(${CMAKE_SOURCE_DIR}/src)
+
+# Adicionar o diretório de scripts de construção do VCPKG ao arquivo CMAKE_TOOLCHAIN
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-set(PROJECT_NAME "VisualizadorDeAlgortimos-VCPKG-CLION-WIN11-IMGUI-CMAKE")
-project(${PROJECT_NAME})
+# Encontrar pacotes necessários.
+find_package(glfw3 CONFIG REQUIRED)
+find_package(glad CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(glew CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
+find_package(TBB CONFIG REQUIRED)
+find_package(range-v3 CONFIG REQUIRED)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# Pastas que contêm arquivos fonte.
+set(SOURCE_DIR
+        ${CMAKE_SOURCE_DIR}/src
+)
 
-include_directories(cmake-build-debug/vcpkg_installed/x64-windows)
-include_directories(include)
-include_directories(include/utils)
-include_directories(include/algorithms)
-include_directories(include/algorithms/graphs/djikstra)
-include_directories(include/algorithms/sorts/bubblesort)
-include_directories(include/algorithms/sorts/quicksort)
+# Recolher todos os arquivos de origem nos diretórios fornecidos.
+file(GLOB SRC_FILES CONFIGURE_DEPENDS "${SOURCE_DIR}/*.hpp" "${SOURCE_DIR}/*.cpp")
 
-file(GLOB SRC_FILES CONFIGURE_DEPENDS "src/*.hpp" "src/*.cpp")
-
+# Definir o destino de saída.
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
-FIND_PACKAGE(glfw3 CONFIG REQUIRED)
-FIND_PACKAGE(glad CONFIG REQUIRED)
-FIND_PACKAGE(glm CONFIG REQUIRED)
-FIND_PACKAGE(OpenGL)
-FIND_PACKAGE(glew CONFIG REQUIRED)
-FIND_PACKAGE(imgui CONFIG REQUIRED)
-FIND_PACKAGE(TBB CONFIG REQUIRED)
-FIND_PACKAGE(range-v3 CONFIG REQUIRED)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE range-v3::meta range-v3::concepts range-v3::range-v3 glfw glad::glad glm::glm OpenGL::GL GLEW::GLEW imgui::imgui TBB::tbb)
+# Linkar as bibliotecas ao executável do projeto.
+target_link_libraries(${PROJECT_NAME} PRIVATE
+        range-v3::meta
+        range-v3::concepts
+        range-v3::range-v3
+        glfw
+        glad::glad
+        glm::glm
+        OpenGL::GL
+        GLEW::GLEW
+        imgui::imgui
+        TBB::tbb
+)
