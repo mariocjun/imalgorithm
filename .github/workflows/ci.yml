@@ -1,4 +1,4 @@
-name: CI
+-name: CI
 
 on: [push, pull_request]
 
@@ -31,13 +31,7 @@ jobs:
           if [[ "${{ runner.os }}" == "Windows" ]]; then 
             ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
           else
-            jq '
-              if .dependencies[] | select(.name?) | .name == "imgui" then
-                .dependencies |= map(if .name == "imgui" then .features |= map(select(. != "dx11-binding" and . != "win32-binding")) else . end)
-              else 
-                . 
-              end
-            ' vcpkg.json > temp.json && mv temp.json vcpkg.json
+            sed -i 's/,[[:space:]]*"dx11-binding",[[:space:]]*"win32-binding"[[:space:]]*//g' vcpkg.json
             ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
           fi
         env:
