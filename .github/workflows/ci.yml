@@ -1,4 +1,4 @@
--name: CI
+-name: CI-teste
 
 on: [push, pull_request]
 
