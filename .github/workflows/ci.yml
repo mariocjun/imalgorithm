@@ -23,6 +23,12 @@ jobs:
               echo "VCPKG_TARGET_TRIPLET=x64-linux" >> $GITHUB_ENV
           fi
 
+      - name: Instalar dependências do Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxmu-dev libxi-dev libgl-dev
+
       - name: Criar diretório de cache vcpkg
         run: mkdir -p "${{ github.workspace }}/vcpkgcache"
 
