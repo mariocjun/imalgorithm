@@ -8,6 +8,10 @@
 
 Este é um projeto com a finalidade de visualizar o funcionamento de diferentes algoritmos. Ele foi desenvolvido utilizando C++, CMake e Vcpkg para gerenciamento de dependências.
 
+
+----------------------------------------------------------------------------------------------------------------------------
+
+
 ## Dependências
 
 O projeto possui as seguintes dependências, que serão automaticamente baixadas e configuradas se você estiver usando Vcpkg:
@@ -24,13 +28,19 @@ O projeto possui as seguintes dependências, que serão automaticamente baixadas
 
 O arquivo `vcpkg.json` desta pasta raiz do projeto descreve todas as dependências obrigatórias.
 
+
+----------------------------------------------------------------------------------------------------------------------------
+
+
 ## Como Construir o Projeto
 
 Este projeto utiliza CMake como seu sistema de construção, portanto é altamente recomendável ter uma versão recente instalada.
 
 O projeto utiliza também Vcpkg para gerenciamento de dependências. É necessário ter o Vcpkg instalado e corretamente configurado em seu ambiente.
 
+
 ------------------------------------------------------------------------------------------------------------------------
+
 
 ### Windows
 
@@ -40,18 +50,29 @@ O projeto utiliza também Vcpkg para gerenciamento de dependências. É necessá
 
 
     vcpkg install
+
+
 4. Crie um diretório de build: 
 
 
     mkdir build && cd build
+
+
 5. Gere o arquivos do projeto: 
 
 
     cmake .. -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+
 6. Compile o projeto: 
 
 
     cmake --build .
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+
 ### Linux
 
 1. Abra o terminal
@@ -60,20 +81,28 @@ O projeto utiliza também Vcpkg para gerenciamento de dependências. É necessá
 
 
     ./vcpkg install
+
+
 4. Crie um diretório de build: 
 
 
     mkdir build && cd build
+
+
 5. Gere o arquivos do projeto: 
 
 
     cmake .. -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+
 6. Compile o projeto com:
 
 
     make
 
+
 **Nota:** As etapas de instalação das dependências podem variar dependendo do distribuição de Linux que você está usando.
+
 
 ----------------------------------------------------------------------------------------------------------------------------
 
@@ -86,26 +115,45 @@ O projeto utiliza também Vcpkg para gerenciamento de dependências. É necessá
 
 
     ./vcpkg install
+
+
 4. Crie um diretório de build: 
 
 
     mkdir build && cd build
+
+
 5. Gere os arquivos do projeto:
 
 
     cmake .. -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+
 6. Compile o projeto com:
 
 
     make
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
+
 ## Integração Contínua
 
 O projeto usa GitHub Actions para integração contínua, compilando e testando automaticamente em três plataformas diferentes: Ubuntu, macOS e Windows.
 Você pode conferir o arquivo `ci.yml` para maiores detalhes.
 
+
+----------------------------------------------------------------------------------------------------------------------------
+
+
 ## Contribuição
 
 Contribuições são sempre bem-vindas. Se você tiver uma ideia para melhorar o aplicativo, sinta-se à vontade para fazer fork e enviar um pull request.
+
+
+----------------------------------------------------------------------------------------------------------------------------
+
 
 ## Screenshots
 

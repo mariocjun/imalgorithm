@@ -1,4 +1,4 @@
-name: CI
+name: CI (Linux, macOS, Windows)
 
 on: [push, pull_request]
 
@@ -73,12 +73,20 @@ jobs:
         run: mkdir cmake-build-debug
         shell: bash
 
+      - name: Instalar LLVM (para macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install llvm
+          echo "CC=/usr/local/opt/llvm/bin/clang" >> $GITHUB_ENV
+          echo "CXX=/usr/local/opt/llvm/bin/clang++" >> $GITHUB_ENV
+        shell: bash
+
       - name: Configurar Projeto com CMake
         shell: bash
         run: |
           cd cmake-build-debug
           if [[ "${{ runner.os }}" == "macOS" ]]; then 
-            cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_TOOLCHAIN_FILE
+            cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_TOOLCHAIN_FILE -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX
           else
             cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_TOOLCHAIN_FILE
           fi
