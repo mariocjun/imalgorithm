@@ -27,13 +27,34 @@ jobs:
       - name: Configurar Dependencias
         shell: bash
         run: |
+          cat << 'EOF' > imgui_original.txt
+          {
+            "name" : "imgui", 
+            "features" : [ "glfw-binding", "opengl3-binding", "dx11-binding", "win32-binding", "docking-experimental" ],
+            "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n\n    find_package(imgui CONFIG REQUIRED)\n\n    target_link_libraries(main PRIVATE imgui::imgui)\n"
+          }
+          EOF
           if [[ "${{ runner.os }}" == "Windows" ]]; then
-              CONFIG_BLOCK='{ "name" : "imgui", "features" : [ "glfw-binding", "opengl3-binding", "dx11-binding", "win32-binding", "docking-experimental" ], "$comment" : "..." }'
+              CONFIG_BLOCK=$(cat << 'EOF'
+              {
+                "name" : "imgui", 
+                "features" : [ "glfw-binding", "opengl3-binding", "dx11-binding", "win32-binding", "docking-experimental" ],
+                "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n\n    find_package(imgui CONFIG REQUIRED)\n\n    target_link_libraries(main PRIVATE imgui::imgui)\n"
+              }
+              EOF
+              )
           else
-              CONFIG_BLOCK='{ "name" : "imgui", "features" : [ "glfw-binding", "opengl3-binding","docking-experimental" ], "$comment" : "..." }'
+              CONFIG_BLOCK=$(cat << 'EOF'
+              {
+                "name" : "imgui", 
+                "features" : [ "glfw-binding", "opengl3-binding","docking-experimental" ],
+                "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n\n    find_package(imgui CONFIG REQUIRED)\n\n    target_link_libraries(main PRIVATE imgui::imgui)\n"
+              }
+              EOF
+              )
           fi
-          IMG_PATTERN='# aqui vai o seu padrao da linha imgui em vcpkg.json'
-          sed "s|$IMG_PATTERN|$CONFIG_BLOCK|" vcpkg.json > temp.json && mv temp.json vcpkg.json
+          sed -i "/$(cat imgui_original.txt)/c\\$CONFIG_BLOCK" vcpkg.json
+
 
       - name: Instalar dependências do Ubuntu
         if: runner.os == 'Linux'
