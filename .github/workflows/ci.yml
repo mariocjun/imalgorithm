@@ -32,8 +32,8 @@ jobs:
             ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
           else
             # remove recursos incompatíveis antes da instalação
-            jq '.dependencies[] | select(.name=="imgui") .features -= ["dx11-binding", "win32-binding"]' vcpkg.json > temp.json && mv temp.json vcpkg.json
-            vcpkg install --feature-flags=binarycaching,manifests
+            jq 'if .dependencies[].name == "imgui" then .dependencies[].features |= map(select(. != "dx11-binding" and . != "win32-binding")) else . end' vcpkg.json > temp.json && mv temp.json vcpkg.json
+            ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
           fi
         env:
           VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkgcache"
