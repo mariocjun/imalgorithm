@@ -2,13 +2,6 @@
 cmake_minimum_required(VERSION 3.12)
 set(CMAKE_CXX_STANDARD 23)
 
-# Diferencia entre macOS e outros sistemas operacionais.
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines-ts")
-else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcoroutines")
-endif()
-
 # Define o nome do projeto e o idioma.
 project("VisualizadorDeAlgortimos" LANGUAGES CXX)
 
@@ -60,3 +53,40 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         imgui::imgui
         TBB::tbb
 )
+
+# Adiciona flags de desempenho ao compilador
+if(COMPILE_FOR_NATIVE)
+    add_compile_options(
+            $<$<CXX_COMPILER_ID:GNU>:-O3 -march=native>
+            $<$<CXX_COMPILER_ID:Clang>: -O3 -march=native>
+            $<$<CXX_COMPILER_ID:MSVC>:/O2 /arch:AVX>
+    )
+endif()
+
+
+option(WARNINGS "" ON)
+option(HARDCORE_WARNINGS "" ON)
+option(COMPILE_FOR_NATIVE "" ON)
+option(COMPILE_WITH_LTO "" ON)
+
+set(WARNINGS_LIST "-Wall;-Wextra;")
+set(HARDCORE_WARNINGS_LIST
+        "-Wall;-Wextra;-Wshadow;-Wpedantic;-Wnon-virtual-dtor;-Wold-style-cast;-Wcast-align;-Wunused;-Woverloaded-virtual;-Wpedantic;-Wconversion;-Wsign-conversion;-Wmisleading-indentation;-Wduplicated-cond;-Wduplicated-branches;-Wlogical-op;-Wnull-dereference;-Wuseless-cast;-Wdouble-promotion;-Wformat=2;-Wlifetime"
+)
+
+if(HARDCORE_WARNINGS)
+    add_compile_definitions(${HARDCORE_WARNINGS_LIST})
+elseif(WARNINGS)
+    add_compile_definitions(${WARNINGS_LIST})
+endif()
+
+if(COMPILE_WITH_LTO AND (CMAKE_BUILD_TYPE MATCHES Release))
+    cmake_policy(SET CMP0069 NEW)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT result)
+    if(result)
+        set(COMPILE_WITH_LTO ON)
+    else()
+        set(COMPILE_WITH_LTO OFF)
+    endif()
+endif()
