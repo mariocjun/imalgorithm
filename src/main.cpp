@@ -267,8 +267,7 @@ int main(int, char **) {
         }
         if (ImGui::BeginMenu("Sorting Algorithms")) {
           if (ImGui::MenuItem("Bubble Sort")) {
-            ImGui::Text("Bubble Sort ainda não implementado");
-            //TODO: Implementar Bubble Sort
+            algorithm.emplace(std::make_unique<ImAlgorithm::bubblesort::BubbleSortGUI>());
           }
           if (ImGui::MenuItem("Selection Sort")) {
             ImGui::Text("Selection Sort ainda não implementado");
@@ -282,17 +281,14 @@ int main(int, char **) {
             ImGui::Text("Merge Sort ainda não implementado");
             //TODO: Implementar Merge Sort
           }
-          if (ImGui::MenuItem("Quick Sort")) {
-            if (ImGui::BeginMenu("Lomuto")) {
-              ImGui::Text("Lomuto ainda não implementado");
-              //TODO: Implementar Lomuto
-              ImGui::EndMenu();
+          if (ImGui::BeginMenu("Quick Sort")) {
+            if (ImGui::MenuItem("Lomuto")) {
+              algorithm.emplace(std::make_unique<ImAlgorithm::quicksort::QuickSortLomutoGUI>());
             }
-            if (ImGui::BeginMenu("Hoare")) {
-              ImGui::Text("Hoare ainda não implementado");
-              //TODO: Implementar Hoare
-              ImGui::EndMenu();
+            if (ImGui::MenuItem("Hoare")) {
+              algorithm.emplace(std::make_unique<ImAlgorithm::quicksort::QuickSortHoareGUI>());
             }
+            ImGui::EndMenu();
           }
           if (ImGui::MenuItem("Heap Sort")) {
             ImGui::Text("Heap Sort ainda não implementado");
@@ -369,9 +365,7 @@ int main(int, char **) {
     if (algorithm.has_value()) {
       glfwSetWindowTitle(window, algorithm->get()->name());
       ImGuiIO &io = ImGui::GetIO();
-      algorithm->get()->show(
-          ImVec2(0, menu_bar_height),
-          ImVec2(io.DisplaySize.x, io.DisplaySize.y - menu_bar_height));
+      algorithm->get()->show(ImVec2(0, menu_bar_height), ImVec2(io.DisplaySize.x, io.DisplaySize.y - menu_bar_height));
     }
 
     // Rendering
@@ -381,7 +375,8 @@ int main(int, char **) {
     glViewport(0, 0, display_w, display_h);
     glClearColor(clear_color.x * clear_color.w,
                  clear_color.y * clear_color.w,
-                 clear_color.z * clear_color.w, clear_color.w);
+                 clear_color.z * clear_color.w,
+                 clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
