@@ -10,8 +10,8 @@
 
 #include "algorithm_coroutine.hpp"
 
-namespace ImAlgorithm {
-namespace bubblesort {
+
+namespace ImAlgorithm::bubblesort {
 
 using BubblesortStepFlags = int;
 enum BubblesortStepFlag : int { NoOp = 0, HighlightCmp = 1, HighlightSwap = 2 };
@@ -43,7 +43,7 @@ BubblesortCoroutine bubblesort(
     co_yield NoOp;
 }
 
-}  // namespace bubblesort
-}  // namespace ImAlgorithm
+} // namespace ImAlgorithm::bubblesort
+
 
 #endif  // IMALGORITHM_BUBBLESORT_COROUTINE_HPP

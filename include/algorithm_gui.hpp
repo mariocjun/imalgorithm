@@ -9,9 +9,9 @@
 namespace ImAlgorithm {
 
 class AlgorithmGUI {
-public:
-    virtual void show(ImVec2 pos, ImVec2 size) = 0;
-    virtual const char * name() const = 0;
+ public:
+  virtual void show(ImVec2 pos, ImVec2 size) = 0;
+  [[nodiscard]] virtual const char *name() const = 0;
 };
 
 }  // namespace ImAlgorithm

@@ -33,10 +33,12 @@ static void glfw_error_callback(int error, const char *description) {
 #include <optional>
 
 #include "algorithm_gui.hpp"
-#include "algorithms/graphs/dijkstra/dijkstra_gui.hpp"
+#include "algorithms/graphs/basic_graph/basic_graph_gui.hpp"
 #include "algorithms/sorts/bubblesort/bubblesort_gui.hpp"
 #include "algorithms/sorts/quicksort/quicksort_gui.hpp"
 
+class BasicGraphGUI;
+class BasicGraphGUI;
 int main(int, char **) {
   // Setup window
   glfwSetErrorCallback(glfw_error_callback);
@@ -155,6 +157,7 @@ int main(int, char **) {
 
     */
     float menu_bar_height;
+    /* Inicio do Menu */
     if (ImGui::BeginMainMenuBar()) {
       if (ImGui::BeginMenu("Algorithms")) {
         if (ImGui::BeginMenu("Data Structures")) {
@@ -182,6 +185,9 @@ int main(int, char **) {
             ImGui::EndMenu();
           }
           if (ImGui::BeginMenu("Graphs")) {
+            if (ImGui::MenuItem("Basic Graph")) {
+              algorithm.emplace(std::make_unique<ImAlgorithm::dijkstra::DijkstraGUI>());
+            }
             if (ImGui::MenuItem("BFS")) {
               ImGui::Text("BFS ainda não implementado");
               //TODO: Implementar BFS
