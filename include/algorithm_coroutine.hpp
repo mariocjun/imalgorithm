@@ -20,7 +20,7 @@ struct AlgorithmCoroutine {
         AlgorithmCoroutine get_return_object() noexcept {
             return AlgorithmCoroutine{this};
         };
-        void unhandled_exception() noexcept { std::terminate(); }
+        void unhandled_exception() noexcept { std::__terminate(); }
         void return_void() noexcept {}
     };
 
@@ -35,7 +35,7 @@ struct AlgorithmCoroutine {
 
     AlgorithmCoroutine(AlgorithmCoroutine const &) = delete;
     AlgorithmCoroutine(AlgorithmCoroutine && rhs)
-        : _handle(std::exchange(rhs._handle, nullptr)) {}
+        : _handle(std::swap(rhs._handle, nullptr)) {}
 
     ~AlgorithmCoroutine() {
         if(_handle) _handle.destroy();
