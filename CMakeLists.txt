@@ -1,3 +1,5 @@
+#define REGEXZAO = "Regex para remover todos os comentarios de um arquivo .hpp: (\/\*[\s\S]*?\*\/)|(\/\/.*) ";
+
 # Define o mínimo necessário.
 cmake_minimum_required(VERSION 3.12)
 set(CMAKE_CXX_STANDARD 23)

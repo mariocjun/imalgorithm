@@ -1,38 +1,34 @@
+#include "utils/graph.hpp"
 #include <iostream>
-#include <memory>
-#include "../include/utils/graph.hpp"
-
-using namespace ImAlgorithm;
 
 int main() {
-    cout << "Criando grafo com 5 vértices e 9 arestas...\n" << endl;
-    Graph<int> graph(5);
-    graph.addEdge(0, 1);
-    graph.addEdge(0, 2);
-    graph.addEdge(1, 3);
-    graph.addEdge(2, 4);
-    graph.addEdge(3, 4);
-    graph.addEdge(4, 0);
-    graph.addEdge(4, 1);
-    graph.addEdge(4, 2);
-    graph.addEdge(4, 3);
+  // Criação de um grafo direcionado
+  ImAlgorithm::Graph<int> graph(true);
 
-    cout << "Gerando DFS com pilha..." << endl;
-    graph.DFS(0);
-    cout << endl;
+  // Adicionando vertices
+  for(int i = 1; i <= 5; i++) {
+    graph.addVertex(i, i*10);
+  }
 
-    cout << "Gerando BFS com fila..." << endl;
-    graph.BFS(0);
-    cout << endl;
+  // Adicionando arestas
+  graph.addEdge(1, 2, 5);
+  graph.addEdge(2, 3, 10);
+  graph.addEdge(3, 4, 15);
+  graph.addEdge(4, 5, 20);
+  graph.addEdge(5, 1, 25);
 
-    cout << "Imprimindo lista de adjacência..." << endl;
-    graph.printAdjList();
-    cout << endl;
+  // Impressão de vertices e suas arestas
+  for(int i = 1; i <= 5; i++) {
+    const auto &adjacent = graph.getNeighbors(i);
+    for(const auto vertex : adjacent) {
+      std::cout << "Edge from Vertex " << i << " to Vertex " << vertex << std::endl;
+    }
+  }
 
-    cout << "Imprimindo matriz de adjacência..." << endl;
-    graph.printAdjMatrix();
-    cout << endl;
+  // Atualização do peso da aresta
+  graph.updateEdgeWeight(1, 2, 50);
+  std::cout << "Updated edge weight from Vertex 1 to Vertex 2: "
+            << graph.getEdges().at(std::make_pair(1,2))->getWeight() << std::endl;
 
-
-    return 0;
+  return 0;
 }
