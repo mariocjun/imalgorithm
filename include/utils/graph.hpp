@@ -16,8 +16,8 @@ template<typename T>
 class Edge;
 
 struct PairHash {
-  template <class T1, class T2>
-  std::size_t operator () (const std::pair<T1,T2>& p) const {
+  template<class T1, class T2>
+  std::size_t operator()(const std::pair<T1, T2> &p) const {
     auto h1 = std::hash<T1>{}(p.first);
     auto h2 = std::hash<T2>{}(p.second);
 
@@ -42,7 +42,7 @@ class Vertex {
   T data_;
   T discoveryTime_;
   bool onStack_{};
-    bool visited_{};
+  bool visited_{};
 };
 
 template<typename T>
@@ -120,7 +120,7 @@ class Graph {
   std::vector<std::pair<int, std::unique_ptr<Edge<T>>>> getEdgesSortedByWeight() const {
     std::vector<std::pair<int, std::unique_ptr<Edge<T>>>> edges(edges_.begin(), edges_.end());
     sort(edges.begin(), edges.end(),
-         [](const auto& a, const auto& b) {
+         [](const auto &a, const auto &b) {
            return a.second->getWeight() < b.second->getWeight();
          });
     return edges;
@@ -128,7 +128,7 @@ class Graph {
 
   void updateEdgeWeight(int from, int to, T newWeight) {
     if (edges_.find(std::make_pair(from, to)) != edges_.end()) {
-      edges_[std::make_pair(from,to)]->setData(newWeight);
+      edges_[std::make_pair(from, to)]->setData(newWeight);
     } else {
       throw std::invalid_argument("Edge does not exist.");
     }
@@ -141,9 +141,11 @@ class Graph {
     return {};
   }
 
-  const std::unordered_map<std::pair<int, int>, std::unique_ptr<Edge<int>>, PairHash>& getEdges() const { return edges_; }
+  const std::unordered_map<std::pair<int, int>,
+                           std::unique_ptr<Edge<int>>,
+                           PairHash> &getEdges() const { return edges_; }
 
-  const std::unordered_map<int, std::unique_ptr<Vertex<T>>>& getVertices() const { return vertices_; }
+  const std::unordered_map<int, std::unique_ptr<Vertex<T>>> &getVertices() const { return vertices_; }
 
   ~Graph() = default;
 };
