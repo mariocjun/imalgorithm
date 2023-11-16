@@ -5,7 +5,7 @@
 // + read the top of imgui.cpp. Read online:
 // https://github.com/ocornut/imgui/tree/master/docs
 
-#include <stdio.h>
+#include <cstdio>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -25,7 +25,8 @@
 #pragma comment(lib, "legacy_stdio_definitions")
 #endif
 
-static void glfw_error_callback(int error, const char * description) {
+static void glfw_error_callback(int error, const char* description)
+{
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
@@ -37,12 +38,13 @@ static void glfw_error_callback(int error, const char * description) {
 #include "algorithms/sorts/bubblesort/bubblesort_gui.hpp"
 #include "algorithms/sorts/quicksort/quicksort_gui.hpp"
 
-int main(int, char **) {
+int main(int, char**)
+{
     // Setup window
     glfwSetErrorCallback(glfw_error_callback);
-    if(!glfwInit()) return 1;
+    if (!glfwInit()) return 1;
 
-        // Decide GL+GLSL versions
+    // Decide GL+GLSL versions
 #if defined(IMGUI_IMPL_OPENGL_ES2)
     // GL ES 2.0 + GLSL 100
     const char * glsl_version = "#version 100";
@@ -58,7 +60,7 @@ int main(int, char **) {
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // Required on Mac
 #else
     // GL 3.0 + GLSL 130
-    const char * glsl_version = "#version 130";
+    const char* glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+
@@ -66,16 +68,16 @@ int main(int, char **) {
 #endif
 
     // Create window with graphics context
-    GLFWwindow * window =
+    GLFWwindow* window =
         glfwCreateWindow(1280, 720, "ImAlgorithm", NULL, NULL);
-    if(window == NULL) return 1;
+    if (window == NULL) return 1;
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);  // Enable vsync
+    glfwSwapInterval(1); // Enable vsync
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO & io = ImGui::GetIO();
+    ImGuiIO& io = ImGui::GetIO();
     (void)io;
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable
     // Keyboard Controls io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; //
@@ -119,7 +121,8 @@ int main(int, char **) {
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Main loop
-    while(!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(window))
+    {
         glfwPollEvents();
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -127,31 +130,40 @@ int main(int, char **) {
         ImGui::NewFrame();
 
         float menu_bar_height;
-        if(ImGui::BeginMainMenuBar()) {
-            if(ImGui::BeginMenu("Algorithms")) {
-                if(ImGui::BeginMenu("Sorts")) {
-                    if(ImGui::MenuItem("Bubblesort")) {
+        if (ImGui::BeginMainMenuBar())
+        {
+            if (ImGui::BeginMenu("Algorithms"))
+            {
+                if (ImGui::BeginMenu("Sorts"))
+                {
+                    if (ImGui::MenuItem("Bubblesort"))
+                    {
                         algorithm.emplace(
                             std::make_unique<
                                 ImAlgorithm::bubblesort::BubbleSortGUI>());
                     }
-                    if(ImGui::BeginMenu("Quicksort")) {
-                        if(ImGui::MenuItem("Lomuto")) {
+                    if (ImGui::BeginMenu("Quicksort"))
+                    {
+                        if (ImGui::MenuItem("Lomuto"))
+                        {
                             algorithm.emplace(
                                 std::make_unique<ImAlgorithm::quicksort::
-                                                     QuickSortLomutoGUI>());
+                                    QuickSortLomutoGUI>());
                         }
-                        if(ImGui::MenuItem("Hoare")) {
+                        if (ImGui::MenuItem("Hoare"))
+                        {
                             algorithm.emplace(
                                 std::make_unique<ImAlgorithm::quicksort::
-                                                     QuickSortHoareGUI>());
+                                    QuickSortHoareGUI>());
                         }
                         ImGui::EndMenu();
                     }
                     ImGui::EndMenu();
                 }
-                if(ImGui::BeginMenu("Graphs")) {
-                    if(ImGui::MenuItem("Dijkstra")) {
+                if (ImGui::BeginMenu("Graphs"))
+                {
+                    if (ImGui::MenuItem("Dijkstra"))
+                    {
                         algorithm.emplace(
                             std::make_unique<
                                 ImAlgorithm::dijkstra::DijkstraGUI>());
@@ -160,16 +172,18 @@ int main(int, char **) {
                 }
                 ImGui::EndMenu();
             }
-            if(ImGui::BeginMenu("Help")) {
+            if (ImGui::BeginMenu("Help"))
+            {
                 ImGui::EndMenu();
             }
             menu_bar_height = ImGui::GetWindowSize().y;
             ImGui::EndMainMenuBar();
         }
 
-        if(algorithm.has_value()) {
+        if (algorithm.has_value())
+        {
             glfwSetWindowTitle(window, algorithm->get()->name());
-            ImGuiIO & io = ImGui::GetIO();
+            ImGuiIO& io = ImGui::GetIO();
             algorithm->get()->show(
                 ImVec2(0, menu_bar_height),
                 ImVec2(io.DisplaySize.x, io.DisplaySize.y - menu_bar_height));

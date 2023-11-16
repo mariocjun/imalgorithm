@@ -4,28 +4,23 @@
   "dependencies" : [
     {
       "name" : "glfw3",
-      "default-features" : true,
-      "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n    find_package(glfw3 CONFIG REQUIRED)\n    target_link_libraries(main PRIVATE glfw)\n"
+      "default-features" : true
     },
     {
       "name" : "glad",
-      "default-features" : true,
-      "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n    find_package(glad CONFIG REQUIRED)\n    target_link_libraries(main PRIVATE glad::glad)\n"
+      "default-features" : true
     },
     {
       "name" : "glm",
-      "default-features" : true,
-      "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n    find_package(glm CONFIG REQUIRED)\n    target_link_libraries(main PRIVATE glm::glm)\n"
+      "default-features" : true
     },
     {
       "name" : "opengl",
-      "default-features" : true,
-      "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n    find_package(OpenGL REQUIRED)\n    target_link_libraries(main PRIVATE OpenGL::GL)\n"
+      "default-features" : true
     },
     {
       "name" : "implot",
-      "default-features" : true,
-      "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n    find_package(implot CONFIG REQUIRED)\n    target_link_libraries(main PRIVATE implot::implot)\n"
+      "default-features" : true
     },
     {
       "name" : "imgui",
@@ -35,8 +30,7 @@
         "dx11-binding",
         "win32-binding",
         "docking-experimental"
-      ],
-      "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n    find_package(imgui CONFIG REQUIRED)\n    target_link_libraries(main PRIVATE imgui::imgui)\n"
+      ]
     },
     {
       "name" : "glew",
@@ -44,13 +38,11 @@
     },
     {
       "name" : "range-v3",
-      "default-features": true,
-      "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n    find_package(range-v3 CONFIG REQUIRED)\n    target_link_libraries(main PRIVATE range-v3::meta range-v3::concepts range-v3::range-v3)\n"
+      "default-features": true
     },
     {
       "name" : "tbb",
-      "default-features": true,
-      "$comment" : "    # este comentário foi gerado heuristicamente, e pode não estar correto\n    find_package(TBB CONFIG REQUIRED)\n    target_link_libraries(main PRIVATE TBB::tbb TBB::tbbmalloc TBB::tbbmalloc_proxy)\n"
+      "default-features": true
     }
   ]
 }
