@@ -1,25 +1,51 @@
-# Define o mínimo necessário.
-cmake_minimum_required(VERSION 3.12)
-set(CMAKE_CXX_STANDARD 23)
+cmake_minimum_required(VERSION 3.20)
 
-# Define o nome do projeto e o idioma.
 project("VisualizadorDeAlgortimos-VCPKG-CLION-WIN11-IMGUI-CMAKE" LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 23)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Usar a pasta build do cmake para diretório de saída.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# Incluir diretórios.
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
-# Adicionar o diretório de scripts de construção do VCPKG ao arquivo CMAKE_TOOLCHAIN
-if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
+if (OVERRIDE_VCPKG_ROOT)
+    message(STATUS "VCPKG nao foi encontrado ou sera sobrescrito.")
+    execute_process(
+            COMMAND git clone https://github.com/microsoft/vcpkg.git
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+    if (CMAKE_HOST_WIN32)
+        execute_process(
+                COMMAND ${CMAKE_BINARY_DIR}/vcpkg/bootstrap-vcpkg.bat
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/vcpkg
+        )
+    elseif (CMAKE_HOST_UNIX OR CMAKE_HOST_APPLE)
+        execute_process(
+                COMMAND ./bootstrap-vcpkg.sh
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/vcpkg
+        )
+    endif ()
+
+    set(ENV{VCPKG_ROOT} ${CMAKE_BINARY_DIR}/vcpkg)
 endif()
 
-# Encontrar pacotes necessários.
+if (CMAKE_HOST_WIN32)
+    execute_process(
+            COMMAND ${CMAKE_BINARY_DIR}/vcpkg/vcpkg.exe install
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/vcpkg
+    )
+elseif (CMAKE_HOST_UNIX OR CMAKE_HOST_APPLE)
+    execute_process(
+            COMMAND ./vcpkg install
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/vcpkg
+    )
+endif ()
+
+set(CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/share)
+
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
@@ -29,27 +55,15 @@ find_package(imgui CONFIG REQUIRED)
 find_package(TBB CONFIG REQUIRED)
 find_package(range-v3 CONFIG REQUIRED)
 
-# Pastas que contêm arquivos fonte.
-set(SOURCE_DIR
-        ${CMAKE_SOURCE_DIR}/src
-)
+set(SOURCE_DIR ${CMAKE_SOURCE_DIR}/src)
 
-# Recolher todos os arquivos de origem nos diretórios fornecidos.
 file(GLOB SRC_FILES CONFIGURE_DEPENDS "${SOURCE_DIR}/*.hpp" "${SOURCE_DIR}/*.cpp")
 
-# Definir o destino de saída.
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
-# Linkar as bibliotecas ao executável do projeto.
-target_link_libraries(${PROJECT_NAME} PRIVATE
-        range-v3::meta
-        range-v3::concepts
-        range-v3::range-v3
-        glfw
-        glad::glad
-        glm::glm
-        OpenGL::GL
-        GLEW::GLEW
-        imgui::imgui
-        TBB::tbb
-)
+target_link_libraries(${PROJECT_NAME} PRIVATE range-v3::meta range-v3::concepts range-v3::range-v3 glfw glad::glad glm::glm OpenGL::GL GLEW::GLEW imgui::imgui TBB::tbb)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_SOURCE_DIR}/vcpkg_installed/x64-windows/bin/glfw3.dll
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>)
