@@ -10,7 +10,7 @@
       "gid": "1000"
     }
   },
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y libxmu-dev libxi-dev libgl-dev libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config git && git clone https://github.com/microsoft/vcpkg /opt/vcpkg && /opt/vcpkg/bootstrap-vcpkg.sh && echo 'export VCPKG_ROOT=/opt/vcpkg' >> ~/.bashrc && echo 'export VCPKG_DEFAULT_TRIPLET=x64-linux' >> ~/.bashrc && echo 'export PATH=/opt/vcpkg:$PATH' >> ~/.bashrc",
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y libxmu-dev libxi-dev libgl-dev libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config git curl zip unzip tar && if [ -f \"${containerWorkspaceFolder}/vcpkg.json\" ]; then cd \"${containerWorkspaceFolder}\" && sed -i '/\"dx11-binding\",/d' vcpkg.json && sed -i '/\"win32-binding\",/d' vcpkg.json; fi && git clone https://github.com/microsoft/vcpkg /opt/vcpkg && /opt/vcpkg/bootstrap-vcpkg.sh && echo 'export VCPKG_ROOT=/opt/vcpkg' >> ~/.bashrc && echo 'export VCPKG_DEFAULT_TRIPLET=x64-linux' >> ~/.bashrc && echo 'export PATH=/opt/vcpkg:$PATH' >> ~/.bashrc && export VCPKG_ROOT=/opt/vcpkg && export VCPKG_DEFAULT_TRIPLET=x64-linux && export PATH=/opt/vcpkg:$PATH && if [ -f \"${containerWorkspaceFolder}/vcpkg.json\" ]; then /opt/vcpkg/vcpkg install --feature-flags=binarycaching,manifests --triplet x64-linux \"--vcpkg-root=/opt/vcpkg\" \"--x-manifest-root=${containerWorkspaceFolder}\" \"--x-install-root=${containerWorkspaceFolder}/vcpkg_installed\"; fi",
   "customizations": {
     "vscode": {
       "extensions": [

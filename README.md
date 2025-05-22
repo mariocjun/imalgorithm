@@ -177,9 +177,9 @@ To build the project using CMake and vcpkg:
     ```
 3.  Configure CMake, pointing to the vcpkg toolchain file:
     ```bash
-    cmake .. -DCMAKE_TOOLCHAIN_FILE=\${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
+    cmake .. -DCMAKE_TOOLCHAIN_FILE=\${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake -DCMAKE_PREFIX_PATH=\${containerWorkspaceFolder}/vcpkg_installed/\${VCPKG_DEFAULT_TRIPLET}
     ```
-    *Note: If your project requires specific vcpkg packages, you might need to install them first using `vcpkg install <package-name>` or by ensuring your `vcpkg.json` manifest is processed.*
+    *Dependencies listed in `vcpkg.json` (with Windows-specific ones automatically removed for compatibility) are installed when the Codespace is created. The `CMAKE_PREFIX_PATH` helps CMake find these pre-installed libraries.*
 4.  Build the project:
     ```bash
     cmake --build .
