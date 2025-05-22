@@ -158,3 +158,10 @@ Contribuições são sempre bem-vindas. Se você tiver uma ideia para melhorar o
 ## Screenshots
 
 ![Quicksort](screenshots/quicksort.png)
+
+## Running in GitHub Codespaces
+This project is configured to run in GitHub Codespaces. To get started:
+1. Click the "Code" button on the GitHub repository page.
+2. Select "Open with Codespaces".
+3. If you're creating a new Codespace, wait for it to build.
+4. The development environment comes pre-configured with Python and the necessary tools specified in `.devcontainer/devcontainer.json`. You can open a terminal and run your Python scripts directly.
