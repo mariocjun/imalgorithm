@@ -1,5 +1,5 @@
 {
-  "image": "mcr.microsoft.com/vscode/devcontainers/python:3",
+  "image": "mcr.microsoft.com/vscode/devcontainers/cpp:0-ubuntu-22.04",
   "features": {
     "ghcr.io/devcontainers/features/common-utils:2": {
       "installZsh": false,
@@ -10,11 +10,12 @@
       "gid": "1000"
     }
   },
-  "postCreateCommand": "pip install pylint",
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y libxmu-dev libxi-dev libgl-dev libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config git && git clone https://github.com/microsoft/vcpkg /opt/vcpkg && /opt/vcpkg/bootstrap-vcpkg.sh && echo 'export VCPKG_ROOT=/opt/vcpkg' >> ~/.bashrc && echo 'export VCPKG_DEFAULT_TRIPLET=x64-linux' >> ~/.bashrc && echo 'export PATH=/opt/vcpkg:$PATH' >> ~/.bashrc",
   "customizations": {
     "vscode": {
       "extensions": [
-        "ms-python.python"
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools"
       ]
     }
   }

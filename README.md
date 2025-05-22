@@ -160,8 +160,27 @@ Contribuições são sempre bem-vindas. Se você tiver uma ideia para melhorar o
 ![Quicksort](screenshots/quicksort.png)
 
 ## Running in GitHub Codespaces
-This project is configured to run in GitHub Codespaces. To get started:
-1. Click the "Code" button on the GitHub repository page.
-2. Select "Open with Codespaces".
-3. If you're creating a new Codespace, wait for it to build.
-4. The development environment comes pre-configured with Python and the necessary tools specified in `.devcontainer/devcontainer.json`. You can open a terminal and run your Python scripts directly.
+
+This project is configured to run in GitHub Codespaces, providing a C++ development environment.
+
+To get started:
+1.  Click the "Code" button on the GitHub repository page.
+2.  Select "Open with Codespaces".
+3.  If you're creating a new Codespace, wait for it to build. This includes setting up C++ tools, CMake, and vcpkg.
+4.  The development environment comes pre-configured. vcpkg is cloned to `/opt/vcpkg` and environment variables like `VCPKG_ROOT` are set up for your terminal sessions.
+
+To build the project using CMake and vcpkg:
+1.  Open a terminal in VS Code.
+2.  Create a build directory and navigate into it:
+    ```bash
+    mkdir build && cd build
+    ```
+3.  Configure CMake, pointing to the vcpkg toolchain file:
+    ```bash
+    cmake .. -DCMAKE_TOOLCHAIN_FILE=\${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake
+    ```
+    *Note: If your project requires specific vcpkg packages, you might need to install them first using `vcpkg install <package-name>` or by ensuring your `vcpkg.json` manifest is processed.*
+4.  Build the project:
+    ```bash
+    cmake --build .
+    ```
