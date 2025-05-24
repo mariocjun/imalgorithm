@@ -167,20 +167,29 @@ To get started:
 1.  Click the "Code" button on the GitHub repository page.
 2.  Select "Open with Codespaces".
 3.  If you're creating a new Codespace, wait for it to build. This includes setting up C++ tools, CMake, and vcpkg.
-4.  The development environment comes pre-configured. vcpkg is cloned to `/opt/vcpkg` and environment variables like `VCPKG_ROOT` are set up for your terminal sessions.
+4.  The development environment comes pre-configured. vcpkg is cloned to `$HOME/vcpkg_tool` and environment variables like `VCPKG_ROOT` (pointing to `$HOME/vcpkg_tool`) are set up for your terminal sessions.
 
-To build the project using CMake and vcpkg:
+To build the project using CMake and vcpkg after your Codespace is ready:
 1.  Open a terminal in VS Code.
-2.  Create a build directory and navigate into it:
+2.  Navigate to your project root (e.g., `/workspaces/imalgorithm` if your project is `imalgorithm`).
     ```bash
-    mkdir build && cd build
+    cd /workspaces/$(basename $PWD) 
     ```
-3.  Configure CMake, pointing to the vcpkg toolchain file:
+    *(Note: The above `cd` command assumes your workspace root in Codespaces is `/workspaces/<repository-name>`. Adjust if your project root is different within the Codespace.)*
+3.  Create a build directory and navigate into it:
     ```bash
-    cmake .. -DCMAKE_TOOLCHAIN_FILE=\${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake -DCMAKE_PREFIX_PATH=\${containerWorkspaceFolder}/vcpkg_installed/\${VCPKG_DEFAULT_TRIPLET}
+    mkdir -p build && cd build
     ```
-    *Dependencies listed in `vcpkg.json` (with Windows-specific ones automatically removed for compatibility) are installed when the Codespace is created. The `CMAKE_PREFIX_PATH` helps CMake find these pre-installed libraries.*
-4.  Build the project:
+4.  Configure CMake, pointing to the vcpkg toolchain file. The `VCPKG_ROOT` is set to `$HOME/vcpkg_tool` by the Codespace setup. For clarity, we use `$HOME/vcpkg_tool` directly in this command.
+    ```bash
+    cmake .. -DCMAKE_TOOLCHAIN_FILE=$HOME/vcpkg_tool/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Debug
+    ```
+    *Dependencies listed in `vcpkg.json` (with Windows-specific ones automatically removed for compatibility) are installed when the Codespace is created.*
+5.  Build the project:
     ```bash
     cmake --build .
+    ```
+    Alternatively, you can use `make`:
+    ```bash
+    make
     ```
