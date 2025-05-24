@@ -193,3 +193,26 @@ To build the project using CMake and vcpkg after your Codespace is ready:
     ```bash
     make
     ```
+
+## Accessing the Graphical User Interface (GUI)
+
+This Codespace is configured with a lightweight graphical desktop environment (Fluxbox) and a VNC server to allow you to run and interact with GUI applications.
+
+**How to Access the GUI:**
+
+1.  **Ensure your Codespace is running.** The VNC server and noVNC web client are started automatically when the Codespace is created or restarted.
+2.  **Access noVNC:**
+    *   Once the Codespace is running, go to the **"Ports"** tab in VS Code (usually in the bottom panel, or accessible via the Command Palette: "Ports: Focus on Ports View").
+    *   You should see port `6080` listed (it might be labeled "noVNC" or similar, or just the port number). Click the "Open in Browser" icon (usually a globe icon) next to port `6080`.
+    *   This will open noVNC in a new browser tab.
+3.  **Connect via noVNC:**
+    *   The noVNC page might show a "Connect" button. Click it.
+    *   You will be prompted for a password. The password is: `password`
+4.  **Using the Desktop:**
+    *   You should now see a simple desktop environment (Fluxbox).
+    *   To run your graphical application, open a terminal emulator from within this VNC desktop (usually by right-clicking on the desktop and looking for a "Terminal" or "xterm" option).
+    *   In that terminal, navigate to your project directory (`cd /workspaces/$(basename $PWD)` or similar) and run your compiled application (e.g., `./build/your_application_name`). The application's GUI should appear within the VNC desktop.
+
+**Troubleshooting:**
+*   If port `6080` is not automatically forwarded or listed, you can try manually forwarding it using the VS Code command palette ("Ports: Forward a Port") and enter `6080`.
+*   If you see a black screen or no desktop after connecting, wait a few moments for Fluxbox to load. You can also try restarting the VNC server from a terminal within the main VS Code Codespace window (e.g., `vncserver -kill :1 && vncserver :1 -localhost no -geometry 1280x720 -depth 24 -fg > /tmp/vncserver.log 2>&1 &`).
