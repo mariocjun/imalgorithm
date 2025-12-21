@@ -1,11 +1,10 @@
-### Example user template template
-### Example user template
-
 # IntelliJ project files
 .idea
 *.iml
 out
 gen
+
+/build
 
 # Created by https://www.toptal.com/developers/gitignore/api/cmake,c++,vcpkg
 # Edit at https://www.toptal.com/developers/gitignore?templates=cmake,c++,vcpkg
