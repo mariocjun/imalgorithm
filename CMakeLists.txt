@@ -1,55 +1,147 @@
-# Define o mínimo necessário.
-cmake_minimum_required(VERSION 3.12)
+# =============================================================================
+# ImAlgorithm - Visualizador de Algoritmos
+# =============================================================================
+cmake_minimum_required(VERSION 3.20)
 set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Define o nome do projeto e o idioma.
-project("VisualizadorDeAlgortimos-VCPKG-CLION-WIN11-IMGUI-CMAKE" LANGUAGES CXX)
+project("ImAlgorithm" LANGUAGES CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-# Usar a pasta build do cmake para diretório de saída.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# Incluir diretórios.
+# =============================================================================
+# FetchContent - Baixar dependências via Git
+# =============================================================================
+include(FetchContent)
+
+# GLFW - Gerenciamento de janela multiplataforma
+FetchContent_Declare(
+    glfw
+    GIT_REPOSITORY https://github.com/glfw/glfw.git
+    GIT_TAG        3.4
+    GIT_SHALLOW    TRUE
+)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+
+# GLM - Matemática para gráficos
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm.git
+    GIT_TAG        1.0.1
+    GIT_SHALLOW    TRUE
+)
+
+# Dear ImGui - Interface gráfica
+FetchContent_Declare(
+    imgui
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG        v1.91.6-docking
+    GIT_SHALLOW    TRUE
+)
+
+# ImPlot - Gráficos para ImGui
+FetchContent_Declare(
+    implot
+    GIT_REPOSITORY https://github.com/epezent/implot.git
+    GIT_TAG        v0.16
+    GIT_SHALLOW    TRUE
+)
+
+# Baixar todas as dependências
+FetchContent_MakeAvailable(glfw glm)
+
+# ImGui e ImPlot precisam de tratamento especial (não têm CMakeLists.txt padrão)
+FetchContent_GetProperties(imgui)
+if(NOT imgui_POPULATED)
+    FetchContent_Populate(imgui)
+endif()
+
+FetchContent_GetProperties(implot)
+if(NOT implot_POPULATED)
+    FetchContent_Populate(implot)
+endif()
+
+# =============================================================================
+# Biblioteca ImGui (compilar manualmente)
+# =============================================================================
+add_library(imgui STATIC
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_demo.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    # Backends
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+)
+
+target_include_directories(imgui PUBLIC
+    ${imgui_SOURCE_DIR}
+    ${imgui_SOURCE_DIR}/backends
+)
+
+target_link_libraries(imgui PUBLIC glfw)
+
+# =============================================================================
+# Biblioteca ImPlot (compilar manualmente)
+# =============================================================================
+add_library(implot STATIC
+    ${implot_SOURCE_DIR}/implot.cpp
+    ${implot_SOURCE_DIR}/implot_items.cpp
+)
+
+target_include_directories(implot PUBLIC
+    ${implot_SOURCE_DIR}
+)
+
+target_link_libraries(implot PUBLIC imgui)
+
+# =============================================================================
+# OpenGL - Vem do sistema
+# =============================================================================
+find_package(OpenGL REQUIRED)
+
+# =============================================================================
+# Projeto Principal
+# =============================================================================
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
-# Adicionar o diretório de scripts de construção do VCPKG ao arquivo CMAKE_TOOLCHAIN
-if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
-endif()
-
-# Encontrar pacotes necessários.
-find_package(glfw3 CONFIG REQUIRED)
-find_package(glad CONFIG REQUIRED)
-find_package(glm CONFIG REQUIRED)
-find_package(OpenGL REQUIRED)
-find_package(glew CONFIG REQUIRED)
-find_package(imgui CONFIG REQUIRED)
-find_package(TBB CONFIG REQUIRED)
-find_package(range-v3 CONFIG REQUIRED)
-
-# Pastas que contêm arquivos fonte.
-set(SOURCE_DIR
-        ${CMAKE_SOURCE_DIR}/src
+# Arquivos fonte do projeto
+file(GLOB SRC_FILES CONFIGURE_DEPENDS 
+    "${CMAKE_SOURCE_DIR}/src/*.hpp" 
+    "${CMAKE_SOURCE_DIR}/src/*.cpp"
 )
 
-# Recolher todos os arquivos de origem nos diretórios fornecidos.
-file(GLOB SRC_FILES CONFIGURE_DEPENDS "${SOURCE_DIR}/*.hpp" "${SOURCE_DIR}/*.cpp")
-
-# Definir o destino de saída.
+# Executável
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
-# Linkar as bibliotecas ao executável do projeto.
+# Linkar bibliotecas
 target_link_libraries(${PROJECT_NAME} PRIVATE
-        range-v3::meta
-        range-v3::concepts
-        range-v3::range-v3
-        glfw
-        glad::glad
-        glm::glm
-        OpenGL::GL
-        GLEW::GLEW
-        imgui::imgui
-        TBB::tbb
+    imgui
+    implot
+    glm::glm
+    OpenGL::GL
 )
+
+# =============================================================================
+# Configurações específicas por plataforma
+# =============================================================================
+if(APPLE)
+    # macOS precisa de frameworks adicionais
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        "-framework Cocoa"
+        "-framework IOKit"
+        "-framework CoreVideo"
+    )
+endif()
+
+if(WIN32)
+    # Windows - esconder console em release
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
+    endif()
+endif()
