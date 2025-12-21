@@ -1,98 +1,68 @@
 name: CI (Linux, macOS, Windows)
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
 
 jobs:
-  build-and-test:
+  build:
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            name: Linux
+          - os: macos-latest
+            name: macOS
+          - os: windows-latest
+            name: Windows
+
     runs-on: ${{ matrix.os }}
+    name: Build (${{ matrix.name }})
 
     steps:
       - name: Checkout código-fonte
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Inicializar vcpkg e definir ambiente
-        run: |
-          git clone https://github.com/microsoft/vcpkg
-          if [[ "${{ runner.os }}" == "Windows" ]]; then
-            ./vcpkg/bootstrap-vcpkg.bat
-            echo "VCPKG_TARGET_TRIPLET=x64-windows" >> $GITHUB_ENV
-          else
-            ./vcpkg/bootstrap-vcpkg.sh
-            echo "VCPKG_TARGET_TRIPLET=x64-linux" >> $GITHUB_ENV
-          fi
-        shell: bash
-
-      - name: Ajustar dependências para não-Windows
-        run: |
-          if [[ "${{ runner.os }}" == "Linux" ]]; then
-            sed -i '/"dx11-binding",/d' vcpkg.json
-            sed -i '/"win32-binding",/d' vcpkg.json
-          elif [[ "${{ runner.os }}" == "macOS" ]]; then
-            sed -i '' '/"dx11-binding",/d' vcpkg.json
-            sed -i '' '/"win32-binding",/d' vcpkg.json
-          fi
-        shell: bash
-
-      - name: Instalar dependências de desenvolvimento Ubuntu (para Linux)
+      # ============================================================
+      # Dependências do sistema (Linux)
+      # ============================================================
+      - name: Instalar dependências do sistema (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libxmu-dev libxi-dev libgl-dev
-        shell: bash
+          sudo apt-get install -y \
+            build-essential \
+            libgl1-mesa-dev \
+            libxrandr-dev \
+            libxinerama-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libxmu-dev \
+            pkg-config
 
-      - name: Instalar dependências adicionais para GLFW (para Linux)
-        if: runner.os == 'Linux'
+      # ============================================================
+      # Configurar e compilar
+      # ============================================================
+      - name: Configurar CMake
+        run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+
+      - name: Compilar
+        run: cmake --build build --config Release
+
+      # ============================================================
+      # Verificar artefatos
+      # ============================================================
+      - name: Verificar executável (Linux/macOS)
+        if: runner.os != 'Windows'
         run: |
-          sudo apt-get install -y libxinerama-dev libxcursor-dev xorg-dev libglu1-mesa-dev pkg-config
-        shell: bash
+          ls -la build/bin/
+          file build/bin/ImAlgorithm
 
-      - name: Criar diretório para cache do vcpkg
-        run: mkdir -p "${{ github.workspace }}/vcpkgcache"
-
-      - name: Instalar pacotes usando vcpkg
+      - name: Verificar executável (Windows)
+        if: runner.os == 'Windows'
         run: |
-          ./vcpkg/vcpkg install --feature-flags=binarycaching,manifests
-        env:
-          VCPKG_DEFAULT_BINARY_CACHE: "${{ github.workspace }}/vcpkgcache"
-          VCPKG_FEATURE_FLAGS: "manifests,versions"
-        shell: bash
-
-      - name: Definir arquivo toolchain do vcpkg
-        shell: bash
-        run: |
-          if [[ "${{ runner.os }}" == "Windows" ]]; then 
-            echo "VCPKG_TOOLCHAIN_FILE=${{ github.workspace }}\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake" >> $GITHUB_ENV
-          else
-            echo "VCPKG_TOOLCHAIN_FILE=${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" >> $GITHUB_ENV
-          fi
-
-      - name: Criar diretório para build do CMake
-        run: mkdir cmake-build-debug
-        shell: bash
-
-      - name: Instalar LLVM (para macOS)
-        if: runner.os == 'macOS'
-        run: |
-          brew install llvm
-          echo "CC=/usr/local/opt/llvm/bin/clang" >> $GITHUB_ENV
-          echo "CXX=/usr/local/opt/llvm/bin/clang++" >> $GITHUB_ENV
-        shell: bash
-
-      - name: Configurar Projeto com CMake
-        shell: bash
-        run: |
-          cd cmake-build-debug
-          if [[ "${{ runner.os }}" == "macOS" ]]; then 
-            cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_TOOLCHAIN_FILE -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX
-          else
-            cmake .. -DCMAKE_TOOLCHAIN_FILE=$VCPKG_TOOLCHAIN_FILE
-          fi
-
-      - name: Fazer a build do projeto com CMake
-        run: |
-          cd cmake-build-debug
-          cmake --build . --config Debug
-        shell: bash
+          dir build\bin\Release\
+        shell: cmd

@@ -1,160 +1,115 @@
 [![CI (Linux, macOS, Windows)](https://github.com/mariocjun/imalgorithm/actions/workflows/ci.yml/badge.svg)](https://github.com/mariocjun/imalgorithm/actions/workflows/ci.yml)
-[![Generic badge](https://img.shields.io/badge/C++-20-blue.svg?style=flat&logo=c%2B%2B)](https://en.cppreference.com/w/cpp/20)
-[![Generic badge](https://img.shields.io/badge/CMake-3.12+-blue.svg?style=flat&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MDguOTkyIiBoZWlnaHQ9IjU1OC42NTYiIGZpbGw9IiNmZmZmZmYiIHhtbG5zOnY9Imh0dHBzOi8vdmVjdGEuaW8vbmFubyI+PHBhdGggZD0iTTYuMzU3IDQ2My4yOTZDNi43OCA0NjIuMDMyIDIzOS4wMTEtLjE0MiAyMzkuMTUzIDBjLjA2OS4wNjggNC45MzUgNTUuNzAzIDEwLjgxNSAxMjMuNjMybDkuMzg4IDEyNC43MzZjLS43MTYuNjc2LTUzLjc1MiA0NS44NjItMTE3Ljg1OCAxMDAuNDE0TDE1LjUxMyA0NTYuMDQzYy01LjE4NyA0LjQ0MS05LjMwNiA3LjcwNi05LjE1NSA3LjI1NHptNDAxLjAyOC0xMC4wNDlsLTEwMS42NjktNDEuODNjLS4zMzgtLjMzOC0zMy45MTItMzg3Ljk0OS0zMy42MjktMzg4LjIzNy4wOTgtLjA5OSA1My40OTYgMTA1Ljg1OSAxMTguNjYzIDIzNS40NjJsMTE4LjI0MiAyMzUuODg2Yy0uMTM0LjEzNC00NS44NTctMTguNDQzLTEwMS42MDgtNDEuMjgyek0wIDUwOS4zNzRjMy44NTgtMy43MSAxNTAuOTc2LTEyOC40ODQgMTUxLjI3Ni0xMjguMzAxLjIzOS4xNDUgNzAuNDczIDI5LjAwMyAxNTYuMDc1IDY0LjEyOWwxNTUuOTM2IDY0LjE1OWMuMTYyLjE2Mi0xMDQuMDc3LjI5NS0yMzEuNjQzLjI5NVMtLjE2MiA1MDkuNTI5IDAgNTA5LjM3NHoiLz48L3N2Zz4=)](https://cmake.org/cmake/help/latest/release/3.12.html)
-[![Generic badge](https://img.shields.io/badge/vcpkg-last-blue)](https://vcpkg.io/)
-[![Generic badge](https://img.shields.io/badge/ImGui-1.82-blue)](https://github.com/ocornut/imgui)
+[![C++23](https://img.shields.io/badge/C++-23-blue.svg?style=flat&logo=c%2B%2B)](https://en.cppreference.com/w/cpp/23)
+[![CMake](https://img.shields.io/badge/CMake-3.20+-blue.svg?style=flat&logo=cmake)](https://cmake.org/)
 
-# Visualizador de Algoritmos
+# ImAlgorithm
 
-Este é um projeto com a finalidade de visualizar o funcionamento de diferentes algoritmos. Ele foi desenvolvido utilizando C++, CMake e Vcpkg para gerenciamento de dependências.
+Visualizador interativo de algoritmos passo a passo. Desenvolvido em C++23 com Dear ImGui para interface gráfica.
 
+## ✨ Funcionalidades
 
-----------------------------------------------------------------------------------------------------------------------------
+- Visualização passo a passo de algoritmos de ordenação
+- Interface gráfica moderna com Dear ImGui
+- Suporte a múltiplos algoritmos:
+  - **Ordenação:** Bubble Sort, Quick Sort (Lomuto e Hoare)
+  - **Grafos:** Dijkstra
+- Multiplataforma: Windows, Linux, macOS
 
+---
 
-## Dependências
+## 📦 Dependências
 
-O projeto possui as seguintes dependências, que serão automaticamente baixadas e configuradas se você estiver usando Vcpkg:
+As dependências são baixadas automaticamente via **CMake FetchContent** durante a configuração:
 
-- GLFW3
-- Glade
-- GLM
-- OpenGL
-- ImPlot
-- ImGui
-- GLEW
-- range-v3
-- TBB (Biblioteca de Blocos de Segmentação Intel)
+| Biblioteca | Versão | Descrição |
+|------------|--------|-----------|
+| [GLFW](https://github.com/glfw/glfw) | 3.4 | Gerenciamento de janelas multiplataforma |
+| [GLM](https://github.com/g-truc/glm) | 1.0.1 | Matemática para gráficos |
+| [Dear ImGui](https://github.com/ocornut/imgui) | 1.91.6-docking | Interface gráfica imediata |
+| [ImPlot](https://github.com/epezent/implot) | 0.16 | Gráficos para ImGui |
 
-O arquivo `vcpkg.json` desta pasta raiz do projeto descreve todas as dependências obrigatórias.
+---
 
+## 🔧 Como Compilar
 
-----------------------------------------------------------------------------------------------------------------------------
+### Pré-requisitos
 
-
-## Como Construir o Projeto
-
-Este projeto utiliza CMake como seu sistema de construção, portanto é altamente recomendável ter uma versão recente instalada.
-
-O projeto utiliza também Vcpkg para gerenciamento de dependências. É necessário ter o Vcpkg instalado e corretamente configurado em seu ambiente.
-
-
-------------------------------------------------------------------------------------------------------------------------
-
+- CMake 3.20 ou superior
+- Compilador com suporte a C++23 (MSVC 2022+, GCC 13+, Clang 16+)
+- Git
 
 ### Windows
 
-1. Abra o PowerShell ou CMD
-2. Navegue até o diretório do projeto
-3. Execute: 
+```powershell
+# Configure o projeto
+cmake -B build -S .
 
+# Compile
+cmake --build build --config Release
 
-    vcpkg install
-
-
-4. Crie um diretório de build: 
-
-
-    mkdir build && cd build
-
-
-5. Gere o arquivos do projeto: 
-
-
-    cmake .. -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg/scripts/buildsystems/vcpkg.cmake
-
-
-6. Compile o projeto: 
-
-
-    cmake --build .
-
-
-----------------------------------------------------------------------------------------------------------------------------
-
+# Execute
+.\build\bin\Release\ImAlgorithm.exe
+```
 
 ### Linux
 
-1. Abra o terminal
-2. Navegue até o diretório do projeto
-3. Execute: 
+```bash
+# Instale dependências do sistema (Ubuntu/Debian)
+sudo apt update
+sudo apt install build-essential cmake git libgl1-mesa-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
 
+# Configure e compile
+cmake -B build -S .
+cmake --build build
 
-    ./vcpkg install
-
-
-4. Crie um diretório de build: 
-
-
-    mkdir build && cd build
-
-
-5. Gere o arquivos do projeto: 
-
-
-    cmake .. -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg/scripts/buildsystems/vcpkg.cmake
-
-
-6. Compile o projeto com:
-
-
-    make
-
-
-**Nota:** As etapas de instalação das dependências podem variar dependendo do distribuição de Linux que você está usando.
-
-
-----------------------------------------------------------------------------------------------------------------------------
-
+# Execute
+./build/bin/ImAlgorithm
+```
 
 ### macOS
 
-1. Abra o terminal
-2. Navegue até o diretório do projeto
-3. Execute: 
+```bash
+# Instale Xcode Command Line Tools
+xcode-select --install
 
+# Configure e compile
+cmake -B build -S .
+cmake --build build
 
-    ./vcpkg install
+# Execute
+./build/bin/ImAlgorithm
+```
 
+---
 
-4. Crie um diretório de build: 
+## 🚀 Integração Contínua
 
+O projeto usa GitHub Actions para compilar e testar automaticamente em:
+- Ubuntu (GCC)
+- macOS (Clang)
+- Windows (MSVC)
 
-    mkdir build && cd build
+Veja o arquivo `.github/workflows/ci.yml` para detalhes.
 
+---
 
-5. Gere os arquivos do projeto:
+## 🤝 Contribuição
 
+Contribuições são bem-vindas! Sinta-se à vontade para:
+1. Fazer fork do repositório
+2. Criar uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abrir um Pull Request
 
-    cmake .. -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg/scripts/buildsystems/vcpkg.cmake
+---
 
-
-6. Compile o projeto com:
-
-
-    make
-
-
-----------------------------------------------------------------------------------------------------------------------------
-
-
-## Integração Contínua
-
-O projeto usa GitHub Actions para integração contínua, compilando e testando automaticamente em três plataformas diferentes: Ubuntu, macOS e Windows.
-Você pode conferir o arquivo `ci.yml` para maiores detalhes.
-
-
-----------------------------------------------------------------------------------------------------------------------------
-
-
-## Contribuição
-
-Contribuições são sempre bem-vindas. Se você tiver uma ideia para melhorar o aplicativo, sinta-se à vontade para fazer fork e enviar um pull request.
-
-
-----------------------------------------------------------------------------------------------------------------------------
-
-
-## Screenshots
+## 📸 Screenshots
 
 ![Quicksort](screenshots/quicksort.png)
+
+---
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para detalhes.
