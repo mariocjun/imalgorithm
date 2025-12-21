@@ -137,11 +137,11 @@ if(APPLE)
         "-framework IOKit"
         "-framework CoreVideo"
     )
+    # Silenciar avisos de depreciação do OpenGL no macOS
+    target_compile_definitions(${PROJECT_NAME} PRIVATE GL_SILENCE_DEPRECATION)
 endif()
 
-if(WIN32)
-    # Windows - esconder console em release
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
-        set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
-    endif()
+if(LINUX)
+    # Linux pode precisar de bibliotecas adicionais
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_DL_LIBS})
 endif()

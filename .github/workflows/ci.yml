@@ -41,6 +41,9 @@ jobs:
             libxcursor-dev \
             libxi-dev \
             libxmu-dev \
+            libwayland-dev \
+            wayland-protocols \
+            libxkbcommon-dev \
             pkg-config
 
       # ============================================================

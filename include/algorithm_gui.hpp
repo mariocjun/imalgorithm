@@ -10,6 +10,7 @@ namespace ImAlgorithm {
 
 class AlgorithmGUI {
 public:
+    virtual ~AlgorithmGUI() = default;
     virtual void show(ImVec2 pos, ImVec2 size) = 0;
     virtual const char * name() const = 0;
 };
