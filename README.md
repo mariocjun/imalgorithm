@@ -4,7 +4,7 @@
 
 # ImAlgorithm
 
-Visualizador interativo de algoritmos passo a passo. Desenvolvido em C++23 com Dear ImGui para interface gráfica.
+Visualizador interativo de algoritmos passo a passo. Desenvolvido em C++23 com Dear ImGui para interface gráfica. Para o repo original, veja [imalgorithm](https://github.com/fhamonic/imalgorithm).
 
 ## ✨ Funcionalidades
 
@@ -109,7 +109,3 @@ Contribuições são bem-vindas! Sinta-se à vontade para:
 ![Quicksort](screenshots/quicksort.png)
 
 ---
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para detalhes.
