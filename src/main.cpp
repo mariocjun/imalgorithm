@@ -1,188 +1,190 @@
-// Dear ImGui: standalone example application for GLFW + OpenGL 3, using
-// programmable pipeline (GLFW is a cross-platform general purpose library for
-// handling windows, inputs, OpenGL/Vulkan/Metal graphics context creation,
-// etc.) If you are new to Dear ImGui, read documentation from the docs/ folder
-// + read the top of imgui.cpp. Read online:
-// https://github.com/ocornut/imgui/tree/master/docs
+// ImAlgorithm - Visualizador de Algoritmos
+// Janela fixa 1920x1080 com fonte grande
 
 #include <stdio.h>
+#include <memory>
+#include <optional>
+
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
 #endif
-#include <GLFW/glfw3.h>  // Will drag system OpenGL headers
-
-// [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to
-// maximize ease of testing and compatibility with old VS compilers. To link
-// with VS2010-era libraries, VS2015+ requires linking with
-// legacy_stdio_definitions.lib, which we do using this pragma. Your own project
-// should not be affected, as you are likely to link with a newer binary of GLFW
-// that is adequate for your version of Visual Studio.
-#if defined(_MSC_VER) && (_MSC_VER >= 1900) && \
-    !defined(IMGUI_DISABLE_WIN32_FUNCTIONS)
-#pragma comment(lib, "legacy_stdio_definitions")
-#endif
-
-static void glfw_error_callback(int error, const char * description) {
-    fprintf(stderr, "Glfw Error %d: %s\n", error, description);
-}
-
-#include <memory>
-#include <optional>
+#include <GLFW/glfw3.h>
 
 #include "algorithm_gui.hpp"
 #include "algorithms/graphs/dijkstra/dijkstra_gui.hpp"
 #include "algorithms/sorts/bubblesort/bubblesort_gui.hpp"
 #include "algorithms/sorts/quicksort/quicksort_gui.hpp"
 
-int main(int, char **) {
-    // Setup window
-    glfwSetErrorCallback(glfw_error_callback);
-    if(!glfwInit()) return 1;
+static void glfw_error_callback(int error, const char* description) {
+    fprintf(stderr, "GLFW Error %d: %s\n", error, description);
+}
 
-        // Decide GL+GLSL versions
+int main(int, char**) {
+    glfwSetErrorCallback(glfw_error_callback);
+    if (!glfwInit()) return 1;
+
+    // Configuração OpenGL
 #if defined(IMGUI_IMPL_OPENGL_ES2)
-    // GL ES 2.0 + GLSL 100
-    const char * glsl_version = "#version 100";
+    const char* glsl_version = "#version 100";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
 #elif defined(__APPLE__)
-    // GL 3.2 + GLSL 150
-    const char * glsl_version = "#version 150";
+    const char* glsl_version = "#version 150";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+ only
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);            // Required on Mac
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #else
-    // GL 3.0 + GLSL 130
-    const char * glsl_version = "#version 130";
+    const char* glsl_version = "#version 130";
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);  // 3.2+
-    // only glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // 3.0+ only
 #endif
 
-    // Create window with graphics context
-    GLFWwindow * window =
-        glfwCreateWindow(1280, 720, "ImAlgorithm", NULL, NULL);
-    if(window == NULL) return 1;
+    // ═══════════════════════════════════════════════════════════
+    // JANELA FIXA 1920x1080
+    // ═══════════════════════════════════════════════════════════
+    constexpr int WINDOW_WIDTH = 1920;
+    constexpr int WINDOW_HEIGHT = 1080;
+    
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);  // Não permite redimensionar
+    
+    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, 
+                                          "ImAlgorithm", nullptr, nullptr);
+    if (window == nullptr) return 1;
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);  // Enable vsync
+    glfwSwapInterval(1);  // VSync
 
-    // Setup Dear ImGui context
+    // Setup ImGui
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO & io = ImGui::GetIO();
-    (void)io;
-    // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable
-    // Keyboard Controls io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; //
-    // Enable Gamepad Controls
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-    // Setup Dear ImGui style
+    // ═══════════════════════════════════════════════════════════
+    // ESTILO DARK COM CORES VIBRANTES
+    // ═══════════════════════════════════════════════════════════
     ImGui::StyleColorsDark();
-    // ImGui::StyleColorsClassic();
+    ImGuiStyle& style = ImGui::GetStyle();
+    
+    // Cores mais vibrantes
+    style.Colors[ImGuiCol_WindowBg] = ImVec4(0.10f, 0.10f, 0.12f, 1.00f);
+    style.Colors[ImGuiCol_Header] = ImVec4(0.20f, 0.40f, 0.70f, 0.80f);
+    style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.30f, 0.50f, 0.80f, 0.90f);
+    style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.35f, 0.55f, 0.85f, 1.00f);
+    style.Colors[ImGuiCol_Button] = ImVec4(0.25f, 0.45f, 0.75f, 0.80f);
+    style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.35f, 0.55f, 0.85f, 0.90f);
+    style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.40f, 0.60f, 0.90f, 1.00f);
+    style.Colors[ImGuiCol_FrameBg] = ImVec4(0.15f, 0.15f, 0.18f, 1.00f);
+    style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.20f, 0.20f, 0.25f, 1.00f);
+    style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.40f, 0.60f, 0.90f, 1.00f);
+    style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.50f, 0.70f, 1.00f, 1.00f);
+    style.Colors[ImGuiCol_CheckMark] = ImVec4(0.40f, 0.80f, 0.40f, 1.00f);
+    style.Colors[ImGuiCol_SeparatorActive] = ImVec4(0.40f, 0.60f, 0.90f, 1.00f);
+    
+    // Bordas arredondadas
+    style.WindowRounding = 8.0f;
+    style.FrameRounding = 4.0f;
+    style.GrabRounding = 4.0f;
+    style.WindowPadding = ImVec2(12, 12);
+    style.FramePadding = ImVec2(8, 6);
+    style.ItemSpacing = ImVec2(10, 8);
+    
+    // ═══════════════════════════════════════════════════════════
+    // FONTE GRANDE (2x o tamanho padrão)
+    // ═══════════════════════════════════════════════════════════
+    ImFontConfig fontConfig;
+    fontConfig.SizePixels = 26.0f;  // Padrão é 13, então 2x = 26
+    fontConfig.OversampleH = 2;
+    fontConfig.OversampleV = 2;
+    io.Fonts->AddFontDefault(&fontConfig);
 
-    // Setup Platform/Renderer backends
+    // Setup backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    // Load Fonts
-    // - If no fonts are loaded, dear imgui will use the default font. You can
-    // also load multiple fonts and use ImGui::PushFont()/PopFont() to select
-    // them.
-    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you
-    // need to select the font among multiple.
-    // - If the file cannot be loaded, the function will return NULL. Please
-    // handle those errors in your application (e.g. use an assertion, or
-    // display an error and quit).
-    // - The fonts will be rasterized at a given size (w/ oversampling) and
-    // stored into a texture when calling
-    // ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame
-    // below will call.
-    // - Read 'docs/FONTS.md' for more instructions and details.
-    // - Remember that in C/C++ if you want to include a backslash \ in a string
-    // literal you need to write a double backslash \\ !
-    // io.Fonts->AddFontDefault();
-    // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-    // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-    // io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    // io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);
-    // ImFont* font =
-    // io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f,
-    // NULL, io.Fonts->GetGlyphRangesJapanese()); IM_ASSERT(font != NULL);
-
-    // Our state
+    // Estado da aplicação
     std::optional<std::unique_ptr<ImAlgorithm::AlgorithmGUI>> algorithm;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    ImVec4 clear_color = ImVec4(0.08f, 0.08f, 0.10f, 1.00f);
 
-    // Main loop
-    while(!glfwWindowShouldClose(window)) {
+    // ═══════════════════════════════════════════════════════════
+    // LOOP PRINCIPAL
+    // ═══════════════════════════════════════════════════════════
+    while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-        // Start the Dear ImGui frame
+        
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        float menu_bar_height;
-        if(ImGui::BeginMainMenuBar()) {
-            if(ImGui::BeginMenu("Algorithms")) {
-                if(ImGui::BeginMenu("Sorts")) {
-                    if(ImGui::MenuItem("Bubblesort")) {
+        // Menu principal
+        float menu_bar_height = 0;
+        if (ImGui::BeginMainMenuBar()) {
+            if (ImGui::BeginMenu("Algorithms")) {
+                if (ImGui::BeginMenu("Sorts")) {
+                    if (ImGui::MenuItem("Bubble Sort")) {
                         algorithm.emplace(
-                            std::make_unique<
-                                ImAlgorithm::bubblesort::BubbleSortGUI>());
+                            std::make_unique<ImAlgorithm::bubblesort::BubbleSortGUI>());
                     }
-                    if(ImGui::BeginMenu("Quicksort")) {
-                        if(ImGui::MenuItem("Lomuto")) {
+                    if (ImGui::BeginMenu("Quick Sort")) {
+                        if (ImGui::MenuItem("Lomuto Partition")) {
                             algorithm.emplace(
-                                std::make_unique<ImAlgorithm::quicksort::
-                                                     QuickSortLomutoGUI>());
+                                std::make_unique<ImAlgorithm::quicksort::QuickSortLomutoGUI>());
                         }
-                        if(ImGui::MenuItem("Hoare")) {
+                        if (ImGui::MenuItem("Hoare Partition")) {
                             algorithm.emplace(
-                                std::make_unique<ImAlgorithm::quicksort::
-                                                     QuickSortHoareGUI>());
+                                std::make_unique<ImAlgorithm::quicksort::QuickSortHoareGUI>());
                         }
                         ImGui::EndMenu();
                     }
                     ImGui::EndMenu();
                 }
-                if(ImGui::BeginMenu("Graphs")) {
-                    if(ImGui::MenuItem("Dijkstra")) {
+                if (ImGui::BeginMenu("Graphs")) {
+                    if (ImGui::MenuItem("Dijkstra")) {
                         algorithm.emplace(
-                            std::make_unique<
-                                ImAlgorithm::dijkstra::DijkstraGUI>());
+                            std::make_unique<ImAlgorithm::dijkstra::DijkstraGUI>());
                     }
                     ImGui::EndMenu();
                 }
-                ImGui::EndMenu();
-            }
-            if(ImGui::BeginMenu("Help")) {
                 ImGui::EndMenu();
             }
             menu_bar_height = ImGui::GetWindowSize().y;
             ImGui::EndMainMenuBar();
         }
 
-        if(algorithm.has_value()) {
+        // Área de visualização (tela inteira menos menu)
+        if (algorithm.has_value()) {
             glfwSetWindowTitle(window, algorithm->get()->name());
-            ImGuiIO & io = ImGui::GetIO();
             algorithm->get()->show(
                 ImVec2(0, menu_bar_height),
-                ImVec2(io.DisplaySize.x, io.DisplaySize.y - menu_bar_height));
+                ImVec2(WINDOW_WIDTH, WINDOW_HEIGHT - menu_bar_height));
+        } else {
+            // Tela inicial
+            ImGui::SetNextWindowPos(ImVec2(0, menu_bar_height));
+            ImGui::SetNextWindowSize(ImVec2(WINDOW_WIDTH, WINDOW_HEIGHT - menu_bar_height));
+            ImGui::Begin("Welcome", nullptr, 
+                        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | 
+                        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar);
+            
+            ImVec2 center = ImVec2(WINDOW_WIDTH / 2.0f, (WINDOW_HEIGHT - menu_bar_height) / 2.0f);
+            ImGui::SetCursorPos(ImVec2(center.x - 200, center.y - 50));
+            ImGui::TextColored(ImVec4(0.4f, 0.7f, 1.0f, 1.0f), "ImAlgorithm");
+            ImGui::SetCursorPos(ImVec2(center.x - 250, center.y + 20));
+            ImGui::TextDisabled("Select an algorithm from the menu above");
+            
+            ImGui::End();
         }
 
-        // Rendering
+        // Render
         ImGui::Render();
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
-        glClearColor(clear_color.x * clear_color.w,
-                     clear_color.y * clear_color.w,
-                     clear_color.z * clear_color.w, clear_color.w);
+        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -193,7 +195,6 @@ int main(int, char **) {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-
     glfwDestroyWindow(window);
     glfwTerminate();
 

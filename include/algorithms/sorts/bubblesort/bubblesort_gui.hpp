@@ -2,10 +2,10 @@
 #define IMALGORITHM_BUBBLESORT_GUI_HPP
 
 #include <algorithm>
+#include <cmath>
 #include <optional>
 #include <random>
 #include <ranges>
-#include <stack>
 #include <vector>
 
 #include "algorithm_gui.hpp"
@@ -27,156 +27,201 @@ private:
     std::vector<int> values;
     std::pair<std::size_t, std::size_t> cmp_indices;
     std::pair<std::size_t, std::size_t> swap_indices;
-
     std::optional<BubblesortCoroutine> bubblesort_coroutine;
+
+    void generateNewArray() {
+        if (length <= 0) return;
+        std::random_device rnd_device;
+        std::mt19937 mersenne_engine{rnd_device()};
+        std::uniform_int_distribution<int> dist{min_value, max_value};
+        values.resize(length);
+        std::ranges::generate(values, [&dist, &mersenne_engine]() {
+            return dist(mersenne_engine);
+        });
+        bubblesort_coroutine.emplace(bubblesort(values, cmp_indices, swap_indices));
+        play = false;
+    }
 
 public:
     void showControlPanel(ImVec2 pos, ImVec2 size) {
         ImGui::SetNextWindowPos(pos);
         ImGui::SetNextWindowSize(size);
-        ImGui::Begin("Quicksort Control Panel", nullptr,
-                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+        ImGui::Begin("BubbleSort", nullptr,
+                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | 
+                     ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 
-        ImGui::Text("Nb Values:");
-        ImGui::SameLine();
-        ImGui::InputInt("##", &length, 0);
-        ImGui::SameLine();
-        if(ImGui::Button("Generate") && length > 0) {
-            std::random_device rnd_device;
-            std::mt19937 mersenne_engine{rnd_device()};
-            std::uniform_int_distribution<int> dist{min_value, max_value};
-            values.resize(length);
-            std::ranges::generate(values, [&dist, &mersenne_engine]() {
-                return dist(mersenne_engine);
-            });
-            bubblesort_coroutine.emplace(
-                bubblesort(values, cmp_indices, swap_indices));
-            play = false;
-        }
-        ImGui::SliderFloat(
-                "##slide_float", &steps_per_s, 1.0f, 1000.0f, "%.01f step/s",
-            ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_NoInput);
+        bool has_algo = bubblesort_coroutine.has_value();
+        bool is_done = has_algo && bubblesort_coroutine->finished();
+        bool can_play = has_algo && !is_done;
 
-        // Bloco de código adicionado para permitir o uso da roda do mouse para alterar o valor do slider
-        ImGui::SetItemKeyOwner(ImGuiKey_MouseWheelY);
-        float wheel = ImGui::GetIO().MouseWheel;
-        if(wheel != 0.0f && ImGui::IsItemHovered()) {
-            steps_per_s = std::clamp(
-                steps_per_s * std::pow(2.0f, wheel), 1.0f, 1000.0f);
-        }
-
+        // ═══════════════════════════════════════════════════════════
+        // TUDO EM UMA LINHA
+        // ═══════════════════════════════════════════════════════════
+        
+        // ESQUERDA: Size + Generate + Playback
+        ImGui::Text("Size:");
         ImGui::SameLine();
-        if(ImGui::Button("Play")) {
-            play = true;
+        ImGui::SetNextItemWidth(320);
+        if (ImGui::InputInt("##size", &length, 10, 100)) {
+            length = std::clamp(length, 1, 1000000);
         }
-        ImGui::SameLine();
-        if(ImGui::Button("Pause")) {
+        ImGui::SameLine(0, 15);
+        if (ImGui::Button("Generate", ImVec2(120, 40))) {
+            generateNewArray();
+        }
+        
+        ImGui::SameLine(0, 30);
+        
+        if (play) {
+            if (ImGui::Button("Pause", ImVec2(100, 40))) play = false;
+        } else {
+            ImGui::BeginDisabled(!can_play);
+            if (ImGui::Button("Play", ImVec2(100, 40))) play = true;
+            ImGui::EndDisabled();
+        }
+        
+        ImGui::SameLine(0, 10);
+        ImGui::BeginDisabled(!can_play);
+        if (ImGui::Button("Step", ImVec2(80, 40))) {
             play = false;
+            if (has_algo && !is_done) bubblesort_coroutine->advance_to_next_step();
         }
-        ImGui::SameLine();
-        if(ImGui::Button("Step forward")) {
+        ImGui::EndDisabled();
+        
+        ImGui::SameLine(0, 10);
+        ImGui::BeginDisabled(!can_play);
+        if (ImGui::Button("Finish", ImVec2(100, 40))) {
             play = false;
-            if(bubblesort_coroutine.has_value()) {
-                if(!bubblesort_coroutine->finished()) {
-                    bubblesort_coroutine->advance_to_next_step();
-                }
+            while (bubblesort_coroutine.has_value() && !bubblesort_coroutine->finished()) {
+                bubblesort_coroutine->advance_to_next_step();
             }
         }
+        ImGui::EndDisabled();
 
-        ImGui::Checkbox("Highlight comparison", &b_highlight_cmp);
+        // DIREITA: Speed + Highlight (posição absoluta)
+        ImGui::SameLine(0, 60);
+        
+        ImGui::Text("Speed:");
         ImGui::SameLine();
-        ImGui::Checkbox("Highlight swap", &b_highlight_swap);
+        ImGui::SetNextItemWidth(200);
+        ImGui::SliderFloat("##speed", &steps_per_s, 1.0f, 3000.0f, "%.0f/s",
+                          ImGuiSliderFlags_Logarithmic);
+        if (ImGui::IsItemHovered()) {
+            float wheel = ImGui::GetIO().MouseWheel;
+            if (wheel != 0.0f) {
+                steps_per_s = std::clamp(steps_per_s * std::pow(1.2f, wheel), 1.0f, 3000.0f);
+            }
+        }
+        
+        ImGui::SameLine(0, 30);
+        ImGui::Text("Highlight:");
+        ImGui::SameLine();
+        ImGui::Checkbox("Cmp", &b_highlight_cmp);
+        ImGui::SameLine(0, 10);
+        ImGui::Checkbox("Swap", &b_highlight_swap);
 
         ImGui::End();
     }
+
     void showValues(ImVec2 pos, ImVec2 size) const {
         ImGui::SetNextWindowPos(pos);
         ImGui::SetNextWindowSize(size);
-        ImGui::Begin("Values", nullptr,
-                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-        ImDrawList * draw_list = ImGui::GetWindowDrawList();
+        ImGui::Begin("Visualization", nullptr,
+                     ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse |
+                     ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+        ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-        ImVec2 content_min_p =
-            ImGui::GetWindowContentRegionMin() + ImGui::GetWindowPos();
-        ImVec2 content_max_p =
-            ImGui::GetWindowContentRegionMax() + ImGui::GetWindowPos();
+        ImVec2 content_min_p = ImGui::GetWindowContentRegionMin() + ImGui::GetWindowPos();
+        ImVec2 content_max_p = ImGui::GetWindowContentRegionMax() + ImGui::GetWindowPos();
         ImVec2 content_size = content_max_p - content_min_p;
 
-        const float width = content_size.x / values.size();
+        if (values.empty()) {
+            ImVec2 center = ImVec2(content_min_p.x + content_size.x / 2 - 200, 
+                                   content_min_p.y + content_size.y / 2 - 20);
+            ImGui::SetCursorPos({center.x - pos.x, center.y - pos.y});
+            ImGui::TextColored({0.5f, 0.5f, 0.5f, 1.0f}, "Click 'Generate' to create an array");
+            ImGui::End();
+            return;
+        }
 
-        auto draw_value_rect = [&](std::size_t i, ImU32 col) {
-            const float height = content_size.y *
-                                 static_cast<float>(values[i] - min_value) /
-                                 (max_value - min_value);
-            draw_list->AddRectFilled(
-                ImVec2(content_min_p.x + (i + 1) * width,
-                       content_max_p.y - height),
-                ImVec2(content_min_p.x + i * width, content_max_p.y), col);
+        const float range = static_cast<float>(max_value - min_value);
+        const std::size_t n = values.size();
+        
+        const std::size_t max_bars = static_cast<std::size_t>(std::max(1.0f, content_size.x));
+        const std::size_t bucket_size = (n + max_bars - 1) / max_bars;
+        const std::size_t num_buckets = (n + bucket_size - 1) / bucket_size;
+        const float bar_width = content_size.x / num_buckets;
+
+        auto draw_bar = [&](std::size_t bucket, float h, ImU32 col) {
+            float x1 = content_min_p.x + bucket * bar_width;
+            float x2 = x1 + bar_width - (bar_width > 2 ? 1 : 0);
+            draw_list->AddRectFilled({x1, content_max_p.y - h}, {x2, content_max_p.y}, col);
         };
 
-        for(std::size_t i = 0; i < values.size(); ++i) {
-            const float c = 200 * static_cast<float>(values[i] - min_value) /
-                            (max_value - min_value);
-            draw_value_rect(i, IM_COL32(255 - c, 0, c, 255));
+        for (std::size_t b = 0; b < num_buckets; ++b) {
+            std::size_t start = b * bucket_size;
+            std::size_t end = std::min(start + bucket_size, n);
+            
+            long long sum = 0;
+            for (std::size_t i = start; i < end; ++i) sum += values[i];
+            int bucket_avg = static_cast<int>(sum / (end - start));
+            
+            float h = content_size.y * (bucket_avg - min_value) / range;
+            float c = 200 * (bucket_avg - min_value) / range;
+            draw_bar(b, h, IM_COL32(255 - static_cast<int>(c), 50, static_cast<int>(c), 255));
         }
 
-/*        for (std::size_t i = 0; i < values.size(); ++i) {
-            const float c = 255 * static_cast<float>(values[i] - min_value) / (max_value - min_value);
+        if (bucket_size == 1) {
+            BubblesortStepFlags step_flags = bubblesort_coroutine.has_value() 
+                ? bubblesort_coroutine->current_step() : NoOp;
 
-            ImU32 color;
-            if (c < 36)
-                color = IM_COL32(255, 0, c * 7, 255); // Vermelho para Laranja
-            else if (c < 72)
-                color = IM_COL32(255 - (c - 36) * 7, (c - 36) * 7, 0, 255); // Laranja para Amarelo
-            else if (c < 108)
-                color = IM_COL32(0, 255 - (c - 72) * 7, (c - 72) * 7, 255); // Amarelo para Verde
-            else if (c < 144)
-                color = IM_COL32((c - 108) * 7, 0, 255 - (c - 108) * 7, 255); // Verde para Azul
-            else if (c < 180)
-                color = IM_COL32(0, (c - 144) * 7, 255 - (c - 144) * 7, 255); // Azul para Anil (Índigo)
-            else
-                color = IM_COL32((c - 180) * 7, 0, 255, 255); // Anil (Índigo) para Violeta
+            auto hl = [&](std::size_t idx, ImU32 col) {
+                if (idx >= n) return;
+                float h = content_size.y * (values[idx] - min_value) / range;
+                draw_bar(idx, h, col);
+            };
 
-            draw_value_rect(i,color);
-        }*/
-
-        BubblesortStepFlags step_flags = bubblesort_coroutine->current_step();
-
-        if(b_highlight_cmp && step_flags & HighlightCmp) {
-            draw_value_rect(cmp_indices.first, IM_COL32(255, 255, 255, 255));
-            draw_value_rect(cmp_indices.second, IM_COL32(255, 255, 255, 255));
-        }
-        if(b_highlight_swap && step_flags & HighlightSwap) {
-            draw_value_rect(swap_indices.first, IM_COL32(255, 255, 255, 255));
-            draw_value_rect(swap_indices.second, IM_COL32(255, 255, 255, 255));
+            if (b_highlight_cmp && (step_flags & HighlightCmp)) {
+                hl(cmp_indices.first, IM_COL32(255, 255, 100, 255));
+                hl(cmp_indices.second, IM_COL32(255, 255, 100, 255));
+            }
+            if (b_highlight_swap && (step_flags & HighlightSwap)) {
+                hl(swap_indices.first, IM_COL32(100, 255, 100, 255));
+                hl(swap_indices.second, IM_COL32(100, 255, 100, 255));
+            }
+        } else {
+            ImGui::SetCursorPos({10, 10});
+            ImGui::TextColored({1, 1, 0, 1}, "Aggregated: %zu elements -> %zu bars", n, num_buckets);
         }
 
         ImGui::End();
     }
-    void show(ImVec2 pos, ImVec2 size) override {
-        showControlPanel(ImVec2(pos.x, pos.y + size.y - 100),
-                         ImVec2(size.x, 100));
-        if(bubblesort_coroutine.has_value()) {
-            if(play) {
-                static float spare_time = 0.0f;
-                ImGuiIO & io = ImGui::GetIO();
-                int nb_steps = (spare_time + io.DeltaTime) * steps_per_s;
-                spare_time =
-                    (spare_time + io.DeltaTime) * steps_per_s - nb_steps;
 
-                for(int i = 0; i < nb_steps; ++i) {
-                    if(bubblesort_coroutine->finished()) break;
-                    bubblesort_coroutine->advance_to_next_step();
-                }
-                play = !bubblesort_coroutine->finished();
+    void show(ImVec2 pos, ImVec2 size) override {
+        float panel_height = 110;
+        
+        showControlPanel(ImVec2(pos.x, pos.y + size.y - panel_height),
+                         ImVec2(size.x, panel_height));
+        
+        if (play && bubblesort_coroutine.has_value() && !bubblesort_coroutine->finished()) {
+            static float spare_time = 0.0f;
+            ImGuiIO& io = ImGui::GetIO();
+            int nb_steps = static_cast<int>((spare_time + io.DeltaTime) * steps_per_s);
+            spare_time = (spare_time + io.DeltaTime) * steps_per_s - nb_steps;
+
+            for (int i = 0; i < nb_steps; ++i) {
+                if (bubblesort_coroutine->finished()) break;
+                bubblesort_coroutine->advance_to_next_step();
             }
-            showValues(pos, ImVec2(size.x, size.y - 100));
+            play = !bubblesort_coroutine->finished();
         }
-    };
-    [[nodiscard]] const char * name() const override { return "BubbleSort"; }
+        
+        showValues(pos, ImVec2(size.x, size.y - panel_height));
+    }
+
+    [[nodiscard]] const char* name() const override { return "BubbleSort"; }
 };
 
 } // namespace ImAlgorithm::bubblesort
 
-
-#endif  // IMALGORITHM_BUBBLESORT_GUI_HPP
+#endif // IMALGORITHM_BUBBLESORT_GUI_HPP
